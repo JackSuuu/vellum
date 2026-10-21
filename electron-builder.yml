@@ -11,6 +11,10 @@ files:
   - resources/tray*.png
   - '!**/*.map'
 asar: true
+# Without a Developer ID certificate electron-builder skips signing, and an
+# unsigned bundle does not start on Apple silicon ("is damaged"). This
+# applies an ad-hoc signature when no certificate is available.
+afterPack: scripts/sign-macos.js
 extraResources:
   # Third-party notice for the Muya editor (MarkText, MIT).
   - from: vendor/muya/LICENSE
