@@ -58,6 +58,26 @@ function slugify(title: string): string {
   return (base || 'untitled').slice(0, 60)
 }
 
+/**
+ * `2026-10-21_15-04` — the moment the note was created, in local time.
+ * It is part of the file name so notes sort by time in Finder / the file
+ * manager of the platform.
+ */
+function createdStamp(timestamp: number): string {
+  const created = new Date(timestamp)
+  const pad = (n: number): string => String(n).padStart(2, '0')
+  const date = `${created.getFullYear()}-${pad(created.getMonth() + 1)}-${pad(created.getDate())}`
+  const time = `${pad(created.getHours())}-${pad(created.getMinutes())}`
+  return `${date}_${time}`
+}
+
+/** `Groceries_2026-10-21_15-04` — the file name of a note, without extension. */
+function fileBaseName(note: Note): string {
+  const title = note.title.trim()
+  const base = title ? slugify(title) : 'Note'
+  return `${base}_${createdStamp(note.createdAt)}`
+}
+
 function serializeFrontmatter(note: Note): string {
   const lines = [
     FRONTMATTER_FENCE,
@@ -166,10 +186,7 @@ export function listNotes(folder: string): VaultNoteFile[] {
 }
 
 function uniqueFilePath(folder: string, note: Note, currentPath: string | null): string {
-  const created = new Date(note.createdAt)
-  const pad = (n: number): string => String(n).padStart(2, '0')
-  const stamp = `${created.getFullYear()}-${pad(created.getMonth() + 1)}-${pad(created.getDate())} ${pad(created.getHours())}${pad(created.getMinutes())}`
-  const base = note.title.trim() ? slugify(note.title) : `Note ${stamp}`
+  const base = fileBaseName(note)
   let candidate = join(folder, `${base}.md`)
   let counter = 2
   while (existsSync(candidate) && candidate !== currentPath) {
@@ -180,8 +197,9 @@ function uniqueFilePath(folder: string, note: Note, currentPath: string | null):
 }
 
 /**
- * Write the note to disk. The file name follows the note title (Apple Notes
- * style) and is renamed when the title changes.
+ * Write the note to disk. The file name is the note title plus the moment it
+ * was created (`Groceries_2026-10-21_15-04.md`), and it is renamed when the
+ * title or the start time changes.
  */
 export function writeNote(
   folder: string,
@@ -206,6 +224,28 @@ export function writeNote(
     }
   }
   return { note, filePath: target, fileName: basename(target) }
+}
+
+/**
+ * Bring notes written by older builds up to the current naming scheme
+ * (`Title_YYYY-MM-DD_HH-MM.md`). Files that already match are left alone.
+ */
+export function migrateNoteFileNames(folder: string): number {
+  if (!existsSync(folder)) return 0
+  let renamed = 0
+  for (const entry of listNotes(folder)) {
+    const expected = fileBaseName(entry.note)
+    if (entry.fileName === `${expected}.md`) continue
+    const target = uniqueFilePath(folder, entry.note, entry.filePath)
+    if (target === entry.filePath) continue
+    try {
+      renameSync(entry.filePath, target)
+      renamed += 1
+    } catch (error) {
+      console.error('[vault] failed to rename the note file:', error)
+    }
+  }
+  return renamed
 }
 
 export function deleteNote(filePath: string): void {

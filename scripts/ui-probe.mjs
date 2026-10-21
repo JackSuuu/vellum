@@ -263,7 +263,13 @@ try {
     await sleep(600)
     const files2 = readdirSync(vault).filter((f) => f.endsWith('.md'))
     const disk2 = files2.map((f) => readFileSync(join(vault, f), 'utf-8')).join('\n')
-    check('title is saved in the frontmatter and names the file', files2.includes('Groceries.md') && disk2.includes('title: "Groceries"'), files2.join(','))
+    // The file name is `Title_YYYY-MM-DD_HH-MM.md`.
+    const named = files2.find((f) => /^Groceries_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}\.md$/.test(f))
+    check(
+      'title is saved in the frontmatter and names the file',
+      Boolean(named) && disk2.includes('title: "Groceries"'),
+      files2.join(',')
+    )
     check('body keeps its content after renaming', disk2.includes('# Persist me'), '')
     // New note, then come back: content must still be there.
     await evaluate(`document.querySelector('[aria-label="New note"]').click(); true`)

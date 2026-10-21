@@ -8,6 +8,7 @@ import {
   deleteNote,
   ensureVault,
   listNotes,
+  migrateNoteFileNames,
   moveNotes,
   writeNote
 } from './vault'
@@ -98,6 +99,17 @@ export function changeVault(nextFolder: string): void {
   })
   fileCache.clear()
   allNotes()
+}
+
+/** Rename the files of notes created by an older build to the current scheme. */
+export function migrateNoteFileNamesInVault(): number {
+  const renamed = migrateNoteFileNames(vaultFolder())
+  if (renamed > 0) {
+    console.log(`[vault] renamed ${renamed} note file(s) to the current scheme`)
+  }
+  fileCache.clear()
+  allNotes()
+  return renamed
 }
 
 /**

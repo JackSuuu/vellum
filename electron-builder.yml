@@ -23,7 +23,7 @@ mac:
   icon: resources/icon.png
   # Fixed artifact names so the landing page download link
   # (releases/latest/download/Vellum-arm64.dmg) never has to change.
-  artifactName: Vellum-arm64.${ext}
+  artifactName: Vellum-${arch}.${ext}
   extendInfo:
     NSHighResolutionCapable: true
     LSUIElement: false
@@ -31,13 +31,16 @@ mac:
 win:
   target:
     - nsis
-  icon: resources/icon.png
+  icon: resources/icon.ico
+  # Fixed names so the landing page links never have to change.
+  artifactName: Vellum-Setup-${arch}.${ext}
 linux:
   target:
     - AppImage
     - deb
   category: Utility
-  icon: resources/icon.png
+  icon: resources/icon-512.png
+  artifactName: Vellum-${arch}.${ext}
   desktop:
     entry:
       StartupWMClass: Vellum

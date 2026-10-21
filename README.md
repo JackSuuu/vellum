@@ -46,16 +46,18 @@ Settings are kept in `vellum-data.json` in the app's user-data folder.
 
 ## Install
 
-Download the latest build for Apple silicon:
+| Platform | Download |
+| --- | --- |
+| macOS (Apple silicon) | [`Vellum-arm64.dmg`](https://github.com/JackSuuu/vellum/releases/latest/download/Vellum-arm64.dmg) |
+| macOS (Intel) | [`Vellum-x64.dmg`](https://github.com/JackSuuu/vellum/releases/latest/download/Vellum-x64.dmg) |
+| Windows (x64 + arm64) | [`Vellum-Setup.exe`](https://github.com/JackSuuu/vellum/releases/latest/download/Vellum-Setup.exe) |
+| Linux (x64) | [`Vellum-x86_64.AppImage`](https://github.com/JackSuuu/vellum/releases/latest/download/Vellum-x86_64.AppImage) |
+| Linux (arm64) | [`Vellum-arm64.AppImage`](https://github.com/JackSuuu/vellum/releases/latest/download/Vellum-arm64.AppImage) |
+| Debian / Ubuntu | [`Vellum-amd64.deb`](https://github.com/JackSuuu/vellum/releases/latest/download/Vellum-amd64.deb) |
 
-```bash
-curl -L -o Vellum-arm64.dmg https://github.com/JackSuuu/vellum/releases/latest/download/Vellum-arm64.dmg
-open Vellum-arm64.dmg
-```
-
-The build is not code-signed, so on first launch macOS will refuse to open it
-directly — drag Vellum to `/Applications`, then right-click it and choose
-**Open**, and confirm. The app then launches normally from then on.
+The macOS build is not code-signed, so on first launch the system will refuse
+to open it directly — drag Vellum to `/Applications`, then right-click it and
+choose **Open**, and confirm. The app then launches normally from then on.
 
 ## Project layout
 
@@ -76,11 +78,13 @@ npm install
 npm run dev          # development
 npm test             # build + end-to-end checks (scripts/ui-probe.mjs all)
 npm run dist:mac     # release/Vellum-arm64.dmg / Vellum-arm64.zip
+npm run dist:win     # release/Vellum-Setup.exe  (+ -x64 / -arm64)
+npm run dist:linux   # release/Vellum-<arch>.AppImage / .deb
 npx electron scripts/gen-icons.mjs   # regenerate icons
 ```
 
-Artifact names are fixed (`Vellum-arm64.dmg`) so the download link in
-`landing/index.html` never has to change between releases.
+Artifact names are fixed (`Vellum-arm64.dmg`, `Vellum-Setup.exe`, …) so the
+download links in `landing/index.html` never have to change between releases.
 
 ## Releasing
 
@@ -91,7 +95,9 @@ npm run dist:mac
 # 2. tag + publish
 git tag v0.1.1
 git push origin main --tags
-gh release create v0.1.1 release/Vellum-arm64.dmg release/Vellum-arm64.zip \
+gh release create v0.1.1 \
+  release/Vellum-arm64.dmg release/Vellum-x64.dmg \
+  release/Vellum-Setup.exe release/Vellum-x86_64.AppImage \
   --title "Vellum v0.1.1" --generate-notes
 
 # 3. the landing page download button now resolves via

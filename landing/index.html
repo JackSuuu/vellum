@@ -422,6 +422,24 @@
         color: var(--ink);
         background: linear-gradient(180deg, #fff, #e9e8ee);
       }
+      .band .platforms {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+      .band .button.ghost {
+        color: rgb(255 255 255 / 0.85);
+        background: rgb(255 255 255 / 0.08);
+        border: 1px solid rgb(255 255 255 / 0.18);
+        font-size: 14px;
+        padding: 12px 20px;
+      }
+      .band .button.ghost:hover {
+        background: rgb(255 255 255 / 0.14);
+        color: #fff;
+      }
       .band .install-note {
         margin: 22px auto 0;
         max-width: 38em;
@@ -511,10 +529,10 @@
           </p>
           <div class="cta">
             <a class="button" href="https://github.com/JackSuuu/vellum/releases/latest/download/Vellum-arm64.dmg" data-download>
-              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.7 2.2-4 2.3-4.1-1.3-1.9-3.3-2.1-4-2.1-1.7-.2-3.3 1-4.2 1-.9 0-2.2-1-3.6-.9-1.9 0-3.6 1.1-4.5 2.7-1.9 3.4-.5 8.3 1.4 11 .9 1.3 2 2.8 3.4 2.8 1.4-.1 1.9-.9 3.5-.9s2.1.9 3.6.9 2.4-1.3 3.3-2.7c1-1.5 1.5-3 1.5-3.1-.1 0-2.7-1.1-2.7-4.6ZM13.7 4.6c.7-.9 1.3-2.2 1.1-3.5-1.1 0-2.4.7-3.2 1.6-.7.8-1.3 2.1-1.1 3.4 1.2.1 2.4-.6 3.2-1.5Z"/></svg>
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16.4 12.6c0-2.7 2.2-4 2.3-4.1-1.3-1.9-3.3-2.1-4-2.1-1.7-.2-3.3 1-4.2 1-.9 0-2.2-1-3.6-.9-1.9 0-3.6 1.1-4.5 2.7-1.9 3.4-.5 8.3 1.4 11 .9 1.3 2 2.8 3.4 2.8 1.4-.1 1.9-.9 3.5-.9s2.1.9 3.6.9 2.4-1.3 3.3-2.7c1-1.5 1.5-3 1.5-3.1-.1 0-2.7-1.1-2.7-4.6ZM13.7 4.6c.7-.9 1.3-2.2 1.1-3.5-1.1 0-2.4.7-3.2 1.6-.7.8-1.3 2.4-1 3.5 1.2.1 2.4-.7 3.1-1.6Z"/></svg>
               Download for macOS
             </a>
-            <span class="cta-note">Free · Apple silicon · macOS 11+</span>
+            <span class="cta-note">Free · macOS 11+ · Windows &amp; Linux too</span>
           </div>
         </div>
 
@@ -610,8 +628,13 @@
         <img src="/icon.png" alt="" />
         <h2>Keep a note one keystroke away.</h2>
         <p>Vellum is free. Download it, press ⌘. and start writing.</p>
-        <!-- Stable link: the asset name is fixed, so this never has to change. -->
-        <a class="button" href="https://github.com/JackSuuu/vellum/releases/latest/download/Vellum-arm64.dmg" data-download>Download for macOS</a>
+        <!-- Stable links: the asset names are fixed, so these never have to change. -->
+        <div class="platforms">
+          <a class="button" href="https://github.com/JackSuuu/vellum/releases/latest/download/Vellum-arm64.dmg" data-download>macOS · Apple silicon</a>
+          <a class="button ghost" href="https://github.com/JackSuuu/vellum/releases/latest/download/Vellum-x64.dmg" data-download>macOS · Intel</a>
+          <a class="button ghost" href="https://github.com/JackSuuu/vellum/releases/latest/download/Vellum-Setup.exe" data-download>Windows</a>
+          <a class="button ghost" href="https://github.com/JackSuuu/vellum/releases/latest/download/Vellum-x86_64.AppImage" data-download>Linux</a>
+        </div>
         <p class="install-note">First launch? macOS will say the app is from an unidentified developer — right-click the app in <code>/Applications</code> and choose <strong>Open</strong>, then confirm. It is open source and unsigned.</p>
       </div>
     </main>

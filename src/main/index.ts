@@ -2,7 +2,7 @@ import { app, nativeTheme, net, protocol } from 'electron'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { ensureNote, prefetchLocation, registerHotkey, registerIpcHandlers } from './ipc'
-import { migrateLegacyNotes } from './notes'
+import { migrateLegacyNotes, migrateNoteFileNamesInVault } from './notes'
 import { unregisterShortcut } from './shortcut'
 import { getStore } from './store'
 import { createTray, refreshTray } from './tray'
@@ -32,6 +32,8 @@ if (!app.requestSingleInstanceLock()) {
     nativeTheme.themeSource = 'light'
     // Move notes from the old JSON database into the markdown vault.
     migrateLegacyNotes()
+    // Bring the file names of existing notes up to the current scheme.
+    migrateNoteFileNamesInVault()
 
     const settings = getStore().read().settings
     setBaseSize(settings.width, settings.height)

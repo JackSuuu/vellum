@@ -1,9 +1,13 @@
 {
   "name": "vellum",
   "version": "0.1.1",
-  "description": "Vellum \u2014 a cross-platform floating Quick Note (Apple Notes style) desktop app",
+  "description": "Vellum — a cross-platform floating Quick Note (Apple Notes style) desktop app",
   "main": "./out/main/index.js",
-  "author": "Vellum",
+  "desktopName": "Vellum",
+  "author": {
+    "name": "JackSuuu",
+    "email": "jack@jacksuuu.dev"
+  },
   "license": "MIT",
   "private": true,
   "scripts": {
@@ -14,9 +18,10 @@
     "test": "npm run build && node scripts/ui-probe.mjs all",
     "icons": "node scripts/gen-icons.mjs",
     "dist": "npm run typecheck && npm run build && electron-builder",
-    "dist:mac": "npm run typecheck && npm run build && electron-builder --mac",
-    "dist:win": "npm run typecheck && npm run build && electron-builder --win",
-    "dist:linux": "npm run typecheck && npm run build && electron-builder --linux"
+    "dist:mac": "npm run typecheck && npm run build && electron-builder --mac --x64 --arm64",
+    "dist:win": "npm run typecheck && npm run build && electron-builder --win --x64 --arm64",
+    "dist:linux": "npm run typecheck && npm run build && electron-builder --linux --x64 --arm64",
+    "dist:all": "npm run typecheck && npm run build && electron-builder --mac --x64 --arm64 && electron-builder --win --x64 --arm64 && electron-builder --linux --x64 --arm64"
   },
   "dependencies": {},
   "devDependencies": {

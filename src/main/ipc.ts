@@ -186,7 +186,11 @@ export function registerIpcHandlers(): void {
       if (typeof patch.pinned === 'boolean') note.pinned = patch.pinned
       if ('endedAt' in patch) note.endedAt = patch.endedAt ?? null
       // The start time is filled in automatically, but the user may correct it.
-      if (typeof patch.createdAt === 'number' && Number.isFinite(patch.createdAt)) note.createdAt = patch.createdAt
+      // It is part of the file name, so a change has to rename the file too.
+      if (typeof patch.createdAt === 'number' && Number.isFinite(patch.createdAt)) {
+        if (patch.createdAt !== note.createdAt) renamed = true
+        note.createdAt = patch.createdAt
+      }
       note.updatedAt = Date.now()
 
       // No broadcast here: the renderer is the one editing, echoing the save
