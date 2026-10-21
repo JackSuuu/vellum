@@ -63,9 +63,10 @@ suffix so nothing is overwritten.
 | Linux (arm64) | [`Vellum-arm64.AppImage`](https://github.com/JackSuuu/vellum/releases/latest/download/Vellum-arm64.AppImage) |
 | Debian / Ubuntu | [`Vellum-amd64.deb`](https://github.com/JackSuuu/vellum/releases/latest/download/Vellum-amd64.deb) |
 
-The macOS build is not code-signed, so on first launch the system will refuse
-to open it directly — drag Vellum to `/Applications`, then right-click it and
-choose **Open**, and confirm. The app then launches normally from then on.
+The macOS build is ad-hoc signed (no Apple Developer ID), so on first launch
+the system will refuse to open it directly — drag Vellum to `/Applications`,
+then right-click it and choose **Open**, and confirm. The app then launches
+normally from then on.
 
 ## Project layout
 
@@ -122,7 +123,9 @@ screenshots to `/tmp/vellum-probe-*.png`.
 - Only one instance runs at a time; opening the app again brings the existing
   window forward. After installing a new build, quit the old one first
   (tray menu → *Quit Vellum*), otherwise the old process keeps running.
-- Builds are not code-signed; on first launch use right-click → *Open*.
+- Builds are ad-hoc signed (no Developer ID certificate); on first launch use
+  right-click → *Open*. A real certificate in the keychain is used automatically
+  when one is present.
 
 ## Credits
 
