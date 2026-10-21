@@ -45,14 +45,16 @@ const api: VellumApi = {
     openSettings: () => ipcRenderer.invoke(IPC.appOpenSettings) as Promise<void>,
     chooseVaultFolder: () => ipcRenderer.invoke(IPC.appChooseFolder) as Promise<string | null>,
     revealNote: (id) => ipcRenderer.invoke(IPC.appRevealNote, id) as Promise<void>,
-    vaultStatus: () => ipcRenderer.invoke(IPC.appVaultStatus) as Promise<VaultStatus>
+    vaultStatus: () => ipcRenderer.invoke(IPC.appVaultStatus) as Promise<VaultStatus>,
+    systemTheme: () => ipcRenderer.invoke(IPC.appSystemTheme) as Promise<{ isDark: boolean }>
   },
   on: {
     newNote: (cb) => subscribe(IPC.eventNewNote, cb),
     openSettings: (cb) => subscribe(IPC.eventOpenSettings, cb),
     noteChanged: (cb) => subscribe(IPC.eventNoteChanged, cb),
     settingsChanged: (cb) => subscribe(IPC.eventSettingsChanged, cb),
-    locationChanged: (cb) => subscribe(IPC.eventLocationChanged, cb)
+    locationChanged: (cb) => subscribe(IPC.eventLocationChanged, cb),
+    systemTheme: (cb) => subscribe(IPC.eventSystemTheme, cb)
   }
 }
 

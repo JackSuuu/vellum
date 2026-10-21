@@ -2,6 +2,8 @@ import { app, nativeTheme, net, protocol } from 'electron'
 import { join } from 'node:path'
 import { pathToFileURL } from 'node:url'
 import { ensureNote, prefetchLocation, registerHotkey, registerIpcHandlers } from './ipc'
+import { broadcast } from './bus'
+import { IPC } from '@shared/ipc'
 import { migrateLegacyNotes, migrateNoteFileNamesInVault } from './notes'
 import { unregisterShortcut } from './shortcut'
 import { getStore } from './store'
@@ -28,18 +30,25 @@ if (!app.requestSingleInstanceLock()) {
   })
 
   app.whenReady().then(() => {
-    // The glass theme is light; keep the macOS vibrancy material light too.
-    nativeTheme.themeSource = 'light'
     // Move notes from the old JSON database into the markdown vault.
     migrateLegacyNotes()
     // Bring the file names of existing notes up to the current scheme.
     migrateNoteFileNamesInVault()
 
     const settings = getStore().read().settings
+    // The appearance follows the OS unless the user picked one explicitly.
+    nativeTheme.themeSource = settings.theme ?? 'system'
     setBaseSize(settings.width, settings.height)
     setAlwaysOnTop(settings.alwaysOnTop)
 
     registerIpcHandlers()
+
+    // Tell the renderer when the user switches the system appearance.
+    nativeTheme.on('updated', () => {
+      // Only "system" follows the OS; an explicit choice must not be overridden.
+      if (nativeTheme.themeSource !== 'system') return
+      broadcast(IPC.eventSystemTheme, nativeTheme.shouldUseDarkColors)
+    })
 
     protocol.handle('asset', async (request) => {
       const { pathname } = new URL(request.url)

@@ -48,20 +48,12 @@ export function ensureVault(folder: string): string {
   return folder
 }
 
-function slugify(title: string): string {
-  const base = (title || '')
-    .trim()
-    .replace(/[\\/:*?"<>|]+/g, '-')
-    .replace(/\s+/g, '-')
-    .replace(/-{2,}/g, '-')
-    .replace(/^[-.]+|[-.]+$/g, '')
-  return (base || 'untitled').slice(0, 60)
-}
-
 /**
  * `2026-10-21_15-04` — the moment the note was created, in local time.
- * It is part of the file name so notes sort by time in Finder / the file
- * manager of the platform.
+ * It is the whole file name, so notes sort by time in Finder / the file
+ * manager of the platform. The title is deliberately *not* part of it: the
+ * title can change at any time, and renaming files on every edit would be
+ * churn. The title lives in the frontmatter instead.
  */
 function createdStamp(timestamp: number): string {
   const created = new Date(timestamp)
@@ -71,11 +63,9 @@ function createdStamp(timestamp: number): string {
   return `${date}_${time}`
 }
 
-/** `Groceries_2026-10-21_15-04` — the file name of a note, without extension. */
+/** `2026-10-21_15-04` — the file name of a note, without extension. */
 function fileBaseName(note: Note): string {
-  const title = note.title.trim()
-  const base = title ? slugify(title) : 'Note'
-  return `${base}_${createdStamp(note.createdAt)}`
+  return createdStamp(note.createdAt)
 }
 
 function serializeFrontmatter(note: Note): string {

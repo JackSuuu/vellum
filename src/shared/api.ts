@@ -39,6 +39,8 @@ export interface VellumApi {
     chooseVaultFolder(): Promise<string | null>
     revealNote(id: string): Promise<void>
     vaultStatus(): Promise<VaultStatus>
+    /** The appearance the operating system currently uses. */
+    systemTheme(): Promise<{ isDark: boolean }>
   }
   on: {
     newNote(cb: (templateId?: string) => void): () => void
@@ -46,5 +48,6 @@ export interface VellumApi {
     noteChanged(cb: (noteId: string | null) => void): () => void
     settingsChanged(cb: (settings: AppSettings) => void): () => void
     locationChanged(cb: (location: LocationInfo | null) => void): () => void
+    systemTheme(cb: (isDark: boolean) => void): () => void
   }
 }

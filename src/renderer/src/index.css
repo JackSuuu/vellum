@@ -6,7 +6,9 @@
    adds the tint, the specular rim and the inner glow on top of it.
    =================================================================== */
 
-:root {
+/* `html:root` (instead of plain `:root`) so these win over Muya's own
+   `:root` block, whatever the bundler's CSS order turns out to be. */
+html:root {
   color-scheme: light;
   --radius: 22px;
   --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI Variable', 'Segoe UI', 'PingFang SC',
@@ -25,6 +27,40 @@
   --glass-tint: rgb(255 255 255 / 0.1);
   --glass-tint-strong: rgb(255 255 255 / 0.58);
   --rim: rgb(255 255 255 / 0.75);
+  /* Sheet / panel surfaces. Overridden wholesale in dark mode. */
+  --sheet-top: rgb(255 255 255 / 0.42);
+  --sheet-bottom: rgb(200 220 255 / 0.25);
+  --sheet-wash: rgb(255 255 255 / 0.14);
+  --panel-bg: linear-gradient(180deg, rgb(255 255 255 / 0.95), rgb(248 248 252 / 0.92));
+  --panel-edge: rgb(255 255 255 / 0.5);
+  --panel-inset: rgb(255 255 255 / 0.95);
+  --group-bg: rgb(255 255 255 / 0.42);
+  --group-inset: rgb(255 255 255 / 0.8);
+  --field-bg: rgb(0 0 0 / 0.05);
+  --field-bg-strong: rgb(0 0 0 / 0.06);
+  --hover-bg: rgb(0 0 0 / 0.045);
+  --hairline-soft: rgb(0 0 0 / 0.08);
+  --menu-bg: #fff;
+  --menu-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.12), 0 12px 32px rgb(0 0 0 / 0.18);
+  --success: #1f7a39;
+  --danger: #d70015;
+  --panel-shadow: rgb(40 40 90 / 0.18);
+  --glass-button-bg: linear-gradient(180deg, rgb(255 255 255 / 0.5), rgb(255 255 255 / 0.12));
+  --glass-button-bg-hover: linear-gradient(180deg, rgb(255 255 255 / 0.85), rgb(255 255 255 / 0.4));
+  --pill-bg: linear-gradient(180deg, rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.32));
+  --pill-bg-hover: linear-gradient(180deg, rgb(255 255 255 / 0.95), rgb(255 255 255 / 0.5));
+  --kbd-bg: rgb(255 255 255 / 0.6);
+  --segmented-active: rgb(255 255 255 / 0.9);
+  --switch-off: rgb(120 120 128 / 0.28);
+  --swatch-ring: #fff;
+  --tile-bg: linear-gradient(180deg, #fff, #f3f3f6);
+  --edge-hairline: rgb(255 255 255 / 0.18);
+  --edge-hairline-soft: rgb(255 255 255 / 0.1);
+  --specular: linear-gradient(150deg, rgb(255 255 255 / 0.62), rgb(255 255 255 / 0.08) 40%, rgb(255 255 255 / 0.03) 70%, rgb(255 255 255 / 0.28));
+  --traffic-glyph: rgb(0 0 0 / 0.5);
+  --hover-bg-strong: rgb(0 0 0 / 0.08);
+  --switch-knob: #fff;
+  --on-accent: #fff;
 
   /* Muya (MarkText editor) theme variables */
   --editor-bg-color: transparent;
@@ -45,11 +81,88 @@
   --float-hover-color: rgb(0 0 0 / 0.05);
   --float-shadow: 0 0 0 0.5px rgb(0 0 0 / 0.12), 0 10px 30px rgb(0 0 0 / 0.16);
   --editor-area-width: 100%;
+  --icon-color: rgb(29 29 31 / 0.45);
+  --table-border-color: rgb(0 0 0 / 0.1);
+  --button-bg-color: #fff;
+  --button-border: 1px solid rgb(0 0 0 / 0.12);
+  --button-bg-color-hover: linear-gradient(#f9f9f9, #f2f2f2);
+  --delete-color: #ff6961;
+}
+
+/* ------------------------------------------------------------------ dark --- */
+html:root[data-theme='dark'] {
+  color-scheme: dark;
+  --ink: rgb(245 245 247 / 0.94);
+  --ink-2: rgb(235 235 240 / 0.62);
+  --ink-3: rgb(235 235 240 / 0.4);
+  --hairline: rgb(255 255 255 / 0.1);
+  --accent-ink: #a78bfa;
+  --accent-soft: rgb(167 139 250 / 0.18);
+  --accent-ring: rgb(167 139 250 / 0.45);
+  --glass-tint: rgb(28 28 34 / 0.62);
+  --glass-tint-strong: rgb(38 38 46 / 0.8);
+  --rim: rgb(255 255 255 / 0.16);
+  --sheet-top: rgb(255 255 255 / 0.09);
+  --sheet-bottom: rgb(90 110 180 / 0.14);
+  --sheet-wash: rgb(255 255 255 / 0.03);
+  --panel-bg: linear-gradient(180deg, rgb(44 44 52 / 0.94), rgb(30 30 37 / 0.92));
+  --panel-edge: rgb(255 255 255 / 0.12);
+  --panel-inset: rgb(255 255 255 / 0.08);
+  --group-bg: rgb(255 255 255 / 0.05);
+  --group-inset: rgb(255 255 255 / 0.07);
+  --field-bg: rgb(255 255 255 / 0.08);
+  --field-bg-strong: rgb(255 255 255 / 0.1);
+  --hover-bg: rgb(255 255 255 / 0.07);
+  --hairline-soft: rgb(255 255 255 / 0.1);
+  --menu-bg: #2c2c34;
+  --menu-shadow: 0 0 0 0.5px rgb(255 255 255 / 0.14), 0 12px 32px rgb(0 0 0 / 0.5);
+  --success: #4ade80;
+  --danger: #ff6961;
+  --panel-shadow: rgb(0 0 0 / 0.55);
+  --glass-button-bg: linear-gradient(180deg, rgb(255 255 255 / 0.11), rgb(255 255 255 / 0.04));
+  --glass-button-bg-hover: linear-gradient(180deg, rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.08));
+  --pill-bg: linear-gradient(180deg, rgb(255 255 255 / 0.12), rgb(255 255 255 / 0.05));
+  --pill-bg-hover: linear-gradient(180deg, rgb(255 255 255 / 0.2), rgb(255 255 255 / 0.1));
+  --kbd-bg: rgb(255 255 255 / 0.08);
+  --segmented-active: rgb(255 255 255 / 0.16);
+  --switch-off: rgb(255 255 255 / 0.16);
+  --swatch-ring: #2c2c34;
+  --tile-bg: linear-gradient(180deg, rgb(255 255 255 / 0.14), rgb(255 255 255 / 0.07));
+  --edge-hairline: rgb(255 255 255 / 0.1);
+  --edge-hairline-soft: rgb(255 255 255 / 0.05);
+  --specular: linear-gradient(150deg, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0.05) 40%, rgb(255 255 255 / 0.02) 70%, rgb(255 255 255 / 0.1));
+  --traffic-glyph: rgb(255 255 255 / 0.6);
+  --hover-bg-strong: rgb(255 255 255 / 0.12);
+  --switch-knob: rgb(255 255 255 / 0.85);
+  --on-accent: #fff;
+
+  --editor-bg-color: transparent;
+  --editor-color: rgb(232 232 237 / 0.88);
+  --editor-color-80: rgb(245 245 247 / 0.95);
+  --editor-color-50: rgb(235 235 240 / 0.55);
+  --editor-color-30: rgb(235 235 240 / 0.3);
+  --editor-color-10: rgb(255 255 255 / 0.09);
+  --editor-color-04: rgb(255 255 255 / 0.05);
+  --code-block-bg-color: rgb(255 255 255 / 0.06);
+  --input-bg-color: rgb(255 255 255 / 0.08);
+  --float-bg-color: rgb(44 44 52 / 0.92);
+  --float-border-color: rgb(255 255 255 / 0.14);
+  --float-hover-color: rgb(255 255 255 / 0.09);
+  --float-shadow: 0 0 0 0.5px rgb(255 255 255 / 0.14), 0 10px 30px rgb(0 0 0 / 0.5);
+  --icon-color: rgb(235 235 240 / 0.45);
+  --table-border-color: rgb(255 255 255 / 0.14);
+  --button-bg-color: rgb(255 255 255 / 0.1);
+  --button-border: 1px solid rgb(255 255 255 / 0.14);
+  --button-bg-color-hover: linear-gradient(rgb(255 255 255 / 0.16), rgb(255 255 255 / 0.1));
+  --delete-color: #ff6961;
 }
 
 /* Windows / Linux have no native desktop blur behind web content. */
 body:not([data-platform='darwin']) {
   --glass-tint: rgb(250 250 252 / 0.9);
+}
+html[data-theme='dark'] body:not([data-platform='darwin']) {
+  --glass-tint: rgb(24 24 28 / 0.94);
 }
 
 /* Typeface switch (Settings → Typeface). */
@@ -92,15 +205,15 @@ body {
   overflow: hidden;
   /* tint + soft top light, like light falling on a glass slab */
   background:
-    radial-gradient(120% 55% at 18% -10%, rgb(255 255 255 / 0.42), transparent 60%),
-    radial-gradient(90% 50% at 100% 110%, rgb(200 220 255 / 0.25), transparent 65%),
-    linear-gradient(180deg, rgb(255 255 255 / 0.14), rgb(255 255 255 / 0.02)),
+    radial-gradient(120% 55% at 18% -10%, var(--sheet-top), transparent 60%),
+    radial-gradient(90% 50% at 100% 110%, var(--sheet-bottom), transparent 65%),
+    linear-gradient(180deg, var(--sheet-wash), transparent),
     var(--glass-tint);
   backdrop-filter: blur(40px) saturate(200%);
   box-shadow:
-    inset 0 0 0 1px rgb(255 255 255 / 0.32),
+    inset 0 0 0 1px var(--edge-hairline),
     inset 0 1px 0 var(--rim),
-    inset 0 -1px 0 rgb(255 255 255 / 0.2);
+    inset 0 -1px 0 var(--edge-hairline-soft);
 }
 
 /* Specular rim: a thin gradient border (bright top-left, fading bottom-right). */
@@ -110,7 +223,7 @@ body {
   inset: 0;
   border-radius: inherit;
   padding: 1px;
-  background: linear-gradient(150deg, rgb(255 255 255 / 0.95), rgb(255 255 255 / 0.15) 40%, rgb(255 255 255 / 0.05) 70%, rgb(255 255 255 / 0.5));
+  background: var(--specular);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
@@ -156,7 +269,7 @@ body {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  color: rgb(0 0 0 / 0.5);
+  color: var(--traffic-glyph);
   box-shadow:
     inset 0 0 0 0.5px rgb(0 0 0 / 0.18),
     inset 0 1px 1px rgb(255 255 255 / 0.55);
@@ -187,7 +300,7 @@ body {
   font-size: 9px;
   line-height: 1;
   font-weight: 700;
-  color: rgb(0 0 0 / 0.55);
+  color: var(--traffic-glyph);
 }
 .traffic-lights:hover .light-close::after {
   content: '×';
@@ -208,10 +321,10 @@ body {
   border-radius: 12px;
   color: var(--ink-2);
   backdrop-filter: blur(12px) saturate(180%);
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.5), rgb(255 255 255 / 0.12));
+  background: var(--glass-button-bg);
   box-shadow:
-    inset 0 0 0 0.5px rgb(255 255 255 / 0.85),
-    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    inset 0 0 0 0.5px rgb(255 255 255 / 0.45),
+    inset 0 1px 0 rgb(255 255 255 / 0.55),
     0 1px 2px rgb(0 0 0 / 0.08),
     0 0 0 0.5px rgb(0 0 0 / 0.06);
   transition:
@@ -221,7 +334,7 @@ body {
 }
 .glass-button:hover {
   color: var(--ink);
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.85), rgb(255 255 255 / 0.4));
+  background: var(--glass-button-bg-hover);
 }
 .glass-button:active {
   transform: scale(0.94);
@@ -307,18 +420,18 @@ body {
   border-radius: 999px;
   font-size: 13px;
   color: var(--ink-2);
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.7), rgb(255 255 255 / 0.32));
+  background: var(--pill-bg);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.9),
+    inset 0 1px 0 rgb(255 255 255 / 0.55),
     0 0 0 0.5px rgb(0 0 0 / 0.1);
   transition: color 140ms, background 140ms;
 }
 button.meta-pill:hover {
   color: var(--ink);
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.95), rgb(255 255 255 / 0.5));
+  background: var(--pill-bg-hover);
 }
 .meta-pill-done {
-  color: #1f7a39;
+  color: var(--success);
   background: linear-gradient(180deg, rgb(52 199 89 / 0.2), rgb(52 199 89 / 0.1));
   box-shadow: inset 0 0 0 0.5px rgb(52 199 89 / 0.35);
 }
@@ -334,7 +447,7 @@ button.meta-pill:hover {
 }
 .meta-pill-clear:hover {
   opacity: 1;
-  background: rgb(0 0 0 / 0.08);
+  background: var(--hover-bg-strong);
 }
 
 .editor-scroll {
@@ -415,13 +528,13 @@ button.meta-pill:hover {
   max-height: 100%;
   overflow: auto;
   border-radius: 18px;
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.95), rgb(248 248 252 / 0.92));
+  background: var(--panel-bg);
   backdrop-filter: blur(36px) saturate(200%);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.95),
-    inset 0 0 0 1px rgb(255 255 255 / 0.5),
+    inset 0 1px 0 var(--panel-inset),
+    inset 0 0 0 1px var(--panel-edge),
     0 0 0 0.5px rgb(0 0 0 / 0.08),
-    0 20px 50px rgb(40 40 90 / 0.18);
+    0 20px 50px var(--panel-shadow);
   animation: panel-in 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 @keyframes panel-in {
@@ -440,7 +553,7 @@ button.meta-pill:hover {
   padding: 0 10px;
   border-radius: 11px;
   color: var(--ink-3);
-  background: rgb(255 255 255 / 0.45);
+  background: var(--field-bg);
   box-shadow: inset 0 0 0 0.5px rgb(0 0 0 / 0.06);
 }
 .search-field input {
@@ -468,7 +581,7 @@ button.meta-pill:hover {
   border-radius: 12px;
 }
 .notes-row:hover {
-  background: rgb(0 0 0 / 0.045);
+  background: var(--hover-bg);
 }
 .notes-open {
   flex: 1;
@@ -515,7 +628,7 @@ button.meta-pill:hover {
 }
 .notes-delete:hover,
 .notes-delete[data-armed='true'] {
-  color: #fff;
+  color: var(--on-accent);
   background: #ff3b30;
 }
 
@@ -537,9 +650,9 @@ button.meta-pill:hover {
   padding: 4px 12px;
   margin-bottom: 12px;
   border-radius: 14px;
-  background: rgb(255 255 255 / 0.42);
+  background: var(--group-bg);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.8),
+    inset 0 1px 0 var(--group-inset),
     0 0 0 0.5px rgb(0 0 0 / 0.06);
 }
 .setting-label {
@@ -565,10 +678,10 @@ button.meta-pill:hover {
   color: var(--ink-3);
 }
 .setting-note.ok {
-  color: #1f7a39;
+  color: var(--success);
 }
 .setting-note.error {
-  color: #d70015;
+  color: var(--danger);
 }
 .hotkey-field {
   min-width: 96px;
@@ -578,7 +691,7 @@ button.meta-pill:hover {
   font-size: 12.5px;
   font-weight: 600;
   letter-spacing: 0.04em;
-  background: rgb(0 0 0 / 0.05);
+  background: var(--field-bg);
 }
 .hotkey-field[data-recording='true'] {
   color: var(--accent);
@@ -597,7 +710,7 @@ button.meta-pill:hover {
   font: inherit;
   font-size: 12.5px;
   color: var(--ink);
-  background: rgb(0 0 0 / 0.05);
+  background: var(--field-bg);
   user-select: text;
 }
 .glass-input:focus {
@@ -633,7 +746,7 @@ button.meta-pill:hover {
 .text-button.danger {
   width: 100%;
   height: 32px;
-  color: #d70015;
+  color: var(--danger);
   background: rgb(255 59 48 / 0.08);
 }
 
@@ -643,7 +756,7 @@ button.meta-pill:hover {
   width: 34px;
   height: 20px;
   border-radius: 999px;
-  background: rgb(120 120 128 / 0.28);
+  background: var(--switch-off);
   transition: background 160ms;
 }
 .switch[data-on='true'] {
@@ -657,7 +770,7 @@ button.meta-pill:hover {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background: #fff;
+  background: var(--switch-knob);
   box-shadow: 0 1px 3px rgb(0 0 0 / 0.25);
   transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
@@ -682,7 +795,7 @@ input[type='range'] {
   padding: 2px;
   gap: 2px;
   border-radius: 10px;
-  background: rgb(0 0 0 / 0.06);
+  background: var(--field-bg-strong);
 }
 .segmented button {
   display: inline-flex;
@@ -696,7 +809,7 @@ input[type='range'] {
 }
 .segmented button[data-active='true'] {
   color: var(--ink);
-  background: rgb(255 255 255 / 0.9);
+  background: var(--segmented-active);
   box-shadow: 0 1px 3px rgb(0 0 0 / 0.12);
 }
 .segmented-sample {
@@ -717,12 +830,10 @@ input[type='range'] {
 .mu-codeblock-language-selector,
 .mu-table-row-col-menu,
 .mu-front-menu {
-  background: #fff !important;
+  background: var(--menu-bg) !important;
   backdrop-filter: none !important;
   border-radius: 12px !important;
-  box-shadow:
-    0 0 0 0.5px rgb(0 0 0 / 0.12),
-    0 12px 32px rgb(0 0 0 / 0.18) !important;
+  box-shadow: var(--menu-shadow) !important;
 }
 .mu-format-picker {
   border-radius: 12px !important;
@@ -745,7 +856,7 @@ input[type='range'] {
   border-radius: 6px;
   font: 600 10.5px/1.6 var(--font-sans);
   color: var(--ink-3);
-  background: rgb(255 255 255 / 0.6);
+  background: var(--kbd-bg);
   box-shadow:
     inset 0 -1px 0 rgb(0 0 0 / 0.08),
     0 0 0 0.5px rgb(0 0 0 / 0.1);
@@ -766,7 +877,7 @@ input[type='range'] {
   font-size: 10px;
   font-weight: 600;
   color: var(--ink-3);
-  background: rgb(0 0 0 / 0.05);
+  background: var(--field-bg);
 }
 .notes-list {
   max-height: 320px;
@@ -801,7 +912,7 @@ input[type='range'] {
 }
 .accent-swatch[data-active='true'] {
   box-shadow:
-    0 0 0 2px #fff,
+    0 0 0 2px var(--swatch-ring),
     0 0 0 4px var(--swatch);
 }
 
@@ -828,11 +939,11 @@ input[type='range'] {
   width: 248px;
   padding: 12px;
   border-radius: 16px;
-  background: linear-gradient(180deg, rgb(255 255 255 / 0.97), rgb(248 248 252 / 0.95));
+  background: var(--panel-bg);
   box-shadow:
-    inset 0 1px 0 #fff,
+    inset 0 1px 0 var(--panel-inset),
     0 0 0 0.5px rgb(0 0 0 / 0.1),
-    0 16px 40px rgb(30 30 60 / 0.2);
+    0 16px 40px var(--panel-shadow);
   animation: panel-in 160ms cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .time-editor-label {
@@ -853,7 +964,7 @@ input[type='range'] {
   justify-content: space-between;
 }
 .text-button.primary {
-  color: #fff;
+  color: var(--on-accent);
   background: var(--accent);
 }
 .text-button.primary:hover {
@@ -905,7 +1016,7 @@ input[type='range'] {
   overflow: hidden;
   border-radius: 9px;
   text-align: center;
-  background: linear-gradient(180deg, #fff, #f3f3f6);
+  background: var(--tile-bg);
   box-shadow:
     0 0 0 0.5px rgb(0 0 0 / 0.12),
     0 2px 4px rgb(0 0 0 / 0.08),
@@ -917,7 +1028,7 @@ input[type='range'] {
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #fff;
+  color: var(--on-accent);
   background: var(--accent);
 }
 .date-tile-day {
@@ -955,5 +1066,62 @@ input[type='range'] {
 }
 .notes-row[data-armed='true'] .notes-title,
 .notes-row[data-armed='true'] .notes-preview {
-  color: #d70015 !important;
+  color: var(--danger) !important;
+}
+
+/* ----------------------------------------------- syntax highlighting (dark) */
+/* Prism's bundled theme is light-only, so the token colours are overridden
+   for the dark appearance (a dark-mode palette on the same tokens). */
+html:root[data-theme='dark'] .token.comment,
+html:root[data-theme='dark'] .token.prolog,
+html:root[data-theme='dark'] .token.doctype,
+html:root[data-theme='dark'] .token.cdata {
+  color: #8b949e;
+}
+html:root[data-theme='dark'] .token.punctuation {
+  color: #7d8590;
+}
+html:root[data-theme='dark'] .token.property,
+html:root[data-theme='dark'] .token.tag,
+html:root[data-theme='dark'] .token.boolean,
+html:root[data-theme='dark'] .token.number,
+html:root[data-theme='dark'] .token.constant,
+html:root[data-theme='dark'] .token.symbol {
+  color: #d2a8ff;
+}
+html:root[data-theme='dark'] .token.selector,
+html:root[data-theme='dark'] .token.attr-name,
+html:root[data-theme='dark'] .token.string,
+html:root[data-theme='dark'] .token.char,
+html:root[data-theme='dark'] .token.builtin {
+  color: #a5d6ff;
+}
+html:root[data-theme='dark'] .token.inserted {
+  color: #7ee787;
+  background: rgb(46 160 67 / 0.22);
+}
+html:root[data-theme='dark'] .token.deleted {
+  color: #ffa198;
+  background: rgb(248 81 73 / 0.2);
+}
+html:root[data-theme='dark'] .token.operator,
+html:root[data-theme='dark'] .token.entity,
+html:root[data-theme='dark'] .token.url,
+html:root[data-theme='dark'] .language-css .token.string,
+html:root[data-theme='dark'] .style .token.string {
+  color: #ffab70;
+}
+html:root[data-theme='dark'] .token.atrule,
+html:root[data-theme='dark'] .token.attr-value,
+html:root[data-theme='dark'] .token.keyword {
+  color: #7ee787;
+}
+html:root[data-theme='dark'] .token.function,
+html:root[data-theme='dark'] .token.class-name {
+  color: #ff7b72;
+}
+html:root[data-theme='dark'] .token.regex,
+html:root[data-theme='dark'] .token.important,
+html:root[data-theme='dark'] .token.variable {
+  color: #79c0ff;
 }

@@ -1,6 +1,6 @@
 import { copyFile, mkdir, writeFile } from 'node:fs/promises'
 import { extname, join } from 'node:path'
-import { app, dialog, ipcMain, shell } from 'electron'
+import { app, dialog, ipcMain, nativeTheme, shell } from 'electron'
 import { IPC } from '@shared/ipc'
 import type { AppSettings, HotkeyStatus, LocationInfo, Note, NoteTemplate } from '@shared/types'
 import { broadcast } from './bus'
@@ -179,10 +179,9 @@ export function registerIpcHandlers(): void {
       let renamed = false
 
       if (typeof patch.markdown === 'string') note.markdown = patch.markdown
-      if (typeof patch.title === 'string' && patch.title.trim() !== note.title) {
-        note.title = patch.title.trim()
-        renamed = true
-      }
+      // The title only lives in the frontmatter; the file name is the creation
+      // date, so changing the title never touches the file on disk.
+      if (typeof patch.title === 'string') note.title = patch.title.trim()
       if (typeof patch.pinned === 'boolean') note.pinned = patch.pinned
       if ('endedAt' in patch) note.endedAt = patch.endedAt ?? null
       // The start time is filled in automatically, but the user may correct it.
@@ -237,6 +236,11 @@ export function registerIpcHandlers(): void {
     if (typeof patch.hotkey === 'string') {
       const status = registerHotkey(patch.hotkey)
       if (!status.ok) console.warn('[shortcut]', status.error)
+    }
+    // "system" lets the OS decide; the concrete appearance is resolved in the
+    // renderer, which then tells us what to show natively.
+    if (typeof patch.theme === 'string') {
+      nativeTheme.themeSource = patch.theme === 'system' ? 'system' : patch.theme
     }
 
     broadcast(IPC.eventSettingsChanged, next)
@@ -303,6 +307,10 @@ export function registerIpcHandlers(): void {
   ipcMain.handle(IPC.appVaultStatus, () => ({
     path: vaultPathForDisplay(),
     noteCount: allNotes().length
+  }))
+
+  ipcMain.handle(IPC.appSystemTheme, () => ({
+    isDark: nativeTheme.shouldUseDarkColors
   }))
 
   ipcMain.handle(IPC.appExportNote, async (_e, id: string) => {

@@ -12,7 +12,9 @@ close it and carry on. Every note is a plain `.md` file in a folder you choose.
   `---`, links and tables renders in place (Typora-style). Select text for the
   floating format bar; type `/` on an empty line for the quick-insert menu.
 - **Isolated title** (Obsidian-style) above the body, stored in the file's
-  frontmatter and used as the file name.
+  frontmatter. The file itself is named after the creation time
+  (`2026-10-21_15-04.md`), so the title can change freely without touching
+  the file name.
 - **Start / end time**: the start time and city are fixed when the note is
   created; *Set end time* stamps the end.
 - **Global shortcut** (default `⌘.`), show/hide from anywhere. The window stays
@@ -22,6 +24,8 @@ close it and carry on. Every note is a plain `.md` file in a folder you choose.
 - **Delete** a note from the switcher with `⌘⌫` (press twice within two seconds
   to confirm).
 - Liquid-glass UI with real macOS vibrancy.
+- **Light / dark / system appearance.** The default follows the operating
+  system and switches live when you change it in the system settings.
 
 ## Storage
 
@@ -43,6 +47,10 @@ template: default
 ```
 
 Settings are kept in `vellum-data.json` in the app's user-data folder.
+
+Each note is a file named after its creation time, e.g.
+`2026-10-21_15-04.md`. Notes created in the same minute get a `-2`, `-3`, …
+suffix so nothing is overwritten.
 
 ## Install
 

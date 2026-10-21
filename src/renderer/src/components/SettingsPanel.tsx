@@ -103,6 +103,27 @@ export function SettingsPanel({ settings, closing, onChange, onClose }: Settings
           />
           <Toggle label="Save the city with new notes" on={settings.locationEnabled} onToggle={() => onChange({ locationEnabled: !settings.locationEnabled })} />
           <div className="setting-row">
+            <span>Appearance</span>
+            <div className="segmented">
+              {(
+                [
+                  ['light', 'Light'],
+                  ['dark', 'Dark'],
+                  ['system', 'System']
+                ] as const
+              ).map(([value, label]) => (
+                <button
+                  key={value}
+                  type="button"
+                  data-active={(settings.theme ?? 'system') === value}
+                  onClick={() => onChange({ theme: value })}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="setting-row">
             <span>Theme colour</span>
             <div className="accent-swatches">
               {(Object.keys(ACCENTS) as (keyof typeof ACCENTS)[]).map((key) => (

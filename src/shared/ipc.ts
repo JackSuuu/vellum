@@ -29,13 +29,15 @@ export const IPC = {
   appChooseFolder: 'app:choose-folder',
   appRevealNote: 'app:reveal-note',
   appVaultStatus: 'app:vault-status',
+  appSystemTheme: 'app:system-theme',
 
   // main -> renderer events
   eventNewNote: 'event:new-note',
   eventOpenSettings: 'event:open-settings',
   eventNoteChanged: 'event:note-changed',
   eventSettingsChanged: 'event:settings-changed',
-  eventLocationChanged: 'event:location-changed'
+  eventLocationChanged: 'event:location-changed',
+  eventSystemTheme: 'event:system-theme'
 } as const
 
 export type IpcChannel = (typeof IPC)[keyof typeof IPC]

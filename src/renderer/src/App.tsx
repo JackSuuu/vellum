@@ -6,6 +6,7 @@ import { NotesPopover } from './components/NotesPopover'
 import { SettingsPanel } from './components/SettingsPanel'
 import { TitleBar } from './components/TitleBar'
 import { applyAccent } from './lib/accent'
+import { applyTheme, setSystemTheme, watchSystemTheme } from './lib/theme'
 
 const SAVE_DELAY = 350
 
@@ -128,10 +129,12 @@ export default function App(): React.JSX.Element {
 
   /* ---------------------------------------------------------- bootstrap -- */
   useEffect(() => {
+    watchSystemTheme()
     void (async () => {
       const [loadedSettings, current] = await Promise.all([window.vellum.settings.get(), window.vellum.notes.current()])
       setSettings(loadedSettings)
       applyAccent(loadedSettings.accent)
+      applyTheme(loadedSettings.theme ?? 'system')
       if (current) {
         savedRef.current = { id: current.id, markdown: current.markdown }
         setNote(current)
@@ -147,13 +150,15 @@ export default function App(): React.JSX.Element {
       window.vellum.on.settingsChanged((next) => {
         setSettings(next)
         applyAccent(next.accent)
+        applyTheme(next.theme ?? 'system')
       }),
       window.vellum.on.noteChanged(async (id) => {
         // Saves are never echoed back, so this is always another note
         // (picked in the tray, created by the shortcut, or after a delete).
         if (id && id === noteRef.current?.id) return
         void open(id ? await window.vellum.notes.get(id) : await window.vellum.notes.current())
-      })
+      }),
+      window.vellum.on.systemTheme((isDark) => setSystemTheme(isDark))
     ]
     return () => offs.forEach((off) => off())
   }, [newNote, open])
@@ -203,6 +208,7 @@ export default function App(): React.JSX.Element {
   const updateSettings = useCallback(async (patch: Partial<AppSettings>) => {
     setSettings((s) => (s ? { ...s, ...patch } : s))
     if (patch.accent) applyAccent(patch.accent)
+    if (patch.theme) applyTheme(patch.theme)
     setSettings(await window.vellum.settings.update(patch))
   }, [])
 

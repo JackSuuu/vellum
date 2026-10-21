@@ -19,7 +19,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   alwaysOnTop: true,
   hideOnBlur: false,
   opacity: 0.86,
-  theme: 'light',
+  theme: 'system',
   width: 440,
   height: 620,
   locale: 'en-US',

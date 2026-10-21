@@ -2,7 +2,7 @@
  * UI probe: launches the built app (out/) in an isolated profile, runs a
  * scenario, prints measurements and saves screenshots to /tmp/vellum-probe-*.png
  *
- *   node scripts/ui-probe.mjs [basic|typing|notes|settings|persist|all]
+ *   node scripts/ui-probe.mjs [basic|typing|notes|settings|theme|persist|all]
  */
 import { spawn } from 'node:child_process'
 import { mkdtempSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
@@ -263,8 +263,8 @@ try {
     await sleep(600)
     const files2 = readdirSync(vault).filter((f) => f.endsWith('.md'))
     const disk2 = files2.map((f) => readFileSync(join(vault, f), 'utf-8')).join('\n')
-    // The file name is `Title_YYYY-MM-DD_HH-MM.md`.
-    const named = files2.find((f) => /^Groceries_\d{4}-\d{2}-\d{2}_\d{2}-\d{2}\.md$/.test(f))
+    // The file name is the creation date only: `YYYY-MM-DD_HH-MM.md`.
+    const named = files2.find((f) => /^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}(-\d+)?\.md$/.test(f))
     check(
       'title is saved in the frontmatter and names the file',
       Boolean(named) && disk2.includes('title: "Groceries"'),
@@ -286,7 +286,10 @@ try {
     // End time.
     await evaluate(`document.querySelector('[data-probe=end-time]').click(); true`)
     await sleep(500)
-    const ended = readdirSync(vault).filter((f) => f.startsWith('Groceries')).map((f) => readFileSync(join(vault, f), 'utf-8'))[0] ?? ''
+    const ended = readdirSync(vault)
+      .filter((f) => /^\d{4}-\d{2}-\d{2}_\d{2}-\d{2}(-\d+)?\.md$/.test(f))
+      .map((f) => readFileSync(join(vault, f), 'utf-8'))
+      .join('\n')
     check('end time is stamped', /ended: \d{4}-/.test(ended), ended.match(/ended:.*/)?.[0])
     await shot('persist')
   }
@@ -301,6 +304,67 @@ try {
     check('⌘. can be registered as the global shortcut', hk.includes('"ok":true'), hk)
     await shot('settings')
   }
+
+  /* ------------------------------------------------------------ theme -- */
+  if (scenario === 'theme' || scenario === 'all') {
+    const themeState = () =>
+      evaluate(
+        `JSON.stringify({
+           attr: document.documentElement.dataset.theme,
+           colorScheme: document.documentElement.style.colorScheme,
+           ink: getComputedStyle(document.documentElement).getPropertyValue('--ink').trim(),
+           editor: getComputedStyle(document.querySelector('.mu-container') || document.body).getPropertyValue('--editor-color').trim()
+         })`
+      ).then(JSON.parse)
+
+    // The settings panel may still be open from the previous scenario.
+    const panelOpen = await evaluate(`!!document.querySelector('[data-probe=settings-panel]')`)
+    if (!panelOpen) {
+      await evaluate(`document.querySelector('[data-probe=settings-button]').click(); true`)
+      await sleep(400)
+    }
+
+    const pick = (label) =>
+      evaluate(
+        `(() => {
+           const buttons = [...document.querySelectorAll('.settings-panel .segmented button')]
+           const target = buttons.find((b) => b.textContent.trim() === ${JSON.stringify(label)})
+           if (!target) return false
+           target.click()
+           return true
+         })()`
+      )
+
+    const offered = await evaluate(
+      `[...document.querySelectorAll('.settings-panel .segmented button')].map((b) => b.textContent.trim()).join(',')`
+    )
+    check('the appearance switch offers Light / Dark / System', offered.includes('Light') && offered.includes('Dark') && offered.includes('System'), offered)
+
+    // Light first, so the comparison does not depend on the current system look.
+    check('light appearance can be selected', await pick('Light'))
+    await sleep(400)
+    const light = await themeState()
+    check('light mode is applied to the document', light.attr === 'light', JSON.stringify(light))
+    check('light mode flips the colour scheme', light.colorScheme === 'light', light.colorScheme)
+
+    check('dark appearance can be selected', await pick('Dark'))
+    await sleep(400)
+    const dark = await themeState()
+    check('dark mode is applied to the document', dark.attr === 'dark', JSON.stringify(dark))
+    check('dark mode flips the colour scheme', dark.colorScheme === 'dark', dark.colorScheme)
+    check('dark mode uses light text', dark.ink !== light.ink, `${light.ink} -> ${dark.ink}`)
+    check('the editor follows dark mode', dark.editor !== light.editor, `${light.editor} -> ${dark.editor}`)
+    await shot('theme-dark')
+
+    // Back to the system appearance.
+    check('the system appearance can be selected', await pick('System'))
+    await sleep(400)
+    const back = await themeState()
+    check('the appearance can be set back to System', back.attr === 'light' || back.attr === 'dark', JSON.stringify(back))
+    await evaluate(`window.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape' })); true`)
+    await sleep(300)
+  }
+
   /* ------------------------------------------------------- lifecycle -- */
   if (scenario === 'lifecycle' || scenario === 'all') {
     const state = () => evaluate(`JSON.stringify({ vis: document.visibilityState, md: window.__muya.getMarkdown() })`).then(JSON.parse)
