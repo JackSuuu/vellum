@@ -17,7 +17,10 @@ close it and carry on. Every note is a plain `.md` file in a folder you choose.
   created; *Set end time* stamps the end.
 - **Global shortcut** (default `⌘.`), show/hide from anywhere. The window stays
   put when you click other apps; closing only hides it.
-- **All notes** (`⌘P`), **new note** (`⌘N`), **settings** (`⌘,`), hide (`⌘W` / `Esc`).
+- **All notes** (`⌘K` / `⌘P`), **new note** (`⌘N`), **settings** (`⌘,`), hide (`⌘W` / `Esc`).
+- **Location** on its own line under the timestamp, editable.
+- **Delete** a note from the switcher with `⌘⌫` (press twice within two seconds
+  to confirm).
 - Liquid-glass UI with real macOS vibrancy.
 
 ## Storage
@@ -41,6 +44,19 @@ template: default
 
 Settings are kept in `vellum-data.json` in the app's user-data folder.
 
+## Install
+
+Download the latest build for Apple silicon:
+
+```bash
+curl -L -o Vellum-arm64.dmg https://github.com/JackSuuu/vellum/releases/latest/download/Vellum-arm64.dmg
+open Vellum-arm64.dmg
+```
+
+The build is not code-signed, so on first launch macOS will refuse to open it
+directly — drag Vellum to `/Applications`, then right-click it and choose
+**Open**, and confirm. The app then launches normally from then on.
+
 ## Project layout
 
 ```
@@ -50,6 +66,7 @@ src/shared/      types + IPC channel names
 src/renderer/    React UI (title bar, note header, notes popover, settings) + Muya editor
 vendor/muya/     Muya source from MarkText (MIT) — see VELLUM_PATCHES.md
 scripts/         ui-probe.mjs (end-to-end checks), gen-icons.mjs
+landing/         Static landing page (deploy to Vercel with this as the root dir)
 ```
 
 ## Commands
@@ -58,8 +75,27 @@ scripts/         ui-probe.mjs (end-to-end checks), gen-icons.mjs
 npm install
 npm run dev          # development
 npm test             # build + end-to-end checks (scripts/ui-probe.mjs all)
-npm run dist:mac     # release/Vellum-<version>-arm64.dmg / .zip
+npm run dist:mac     # release/Vellum-arm64.dmg / Vellum-arm64.zip
 npx electron scripts/gen-icons.mjs   # regenerate icons
+```
+
+Artifact names are fixed (`Vellum-arm64.dmg`) so the download link in
+`landing/index.html` never has to change between releases.
+
+## Releasing
+
+```bash
+# 1. bump "version" in package.json
+npm run dist:mac
+
+# 2. tag + publish
+git tag v0.1.1
+git push origin main --tags
+gh release create v0.1.1 release/Vellum-arm64.dmg release/Vellum-arm64.zip \
+  --title "Vellum v0.1.1" --generate-notes
+
+# 3. the landing page download button now resolves via
+#    releases/latest/download/Vellum-arm64.dmg
 ```
 
 `scripts/ui-probe.mjs` launches the built app in a throw-away profile and

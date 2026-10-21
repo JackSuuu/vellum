@@ -21,6 +21,9 @@ mac:
     - dmg
     - zip
   icon: resources/icon.png
+  # Fixed artifact names so the landing page download link
+  # (releases/latest/download/Vellum-arm64.dmg) never has to change.
+  artifactName: Vellum-arm64.${ext}
   extendInfo:
     NSHighResolutionCapable: true
     LSUIElement: false
