@@ -1,0 +1,44 @@
+appId: com.vellum.quicknote
+productName: Vellum
+copyright: Copyright © 2026 Vellum
+directories:
+  buildResources: resources
+  output: release
+files:
+  - out/**/*
+  - package.json
+  # Tray icons are loaded at runtime from <app>/resources/.
+  - resources/tray*.png
+  - '!**/*.map'
+asar: true
+extraResources:
+  # Third-party notice for the Muya editor (MarkText, MIT).
+  - from: vendor/muya/LICENSE
+    to: licenses/muya-marktext-LICENSE.txt
+mac:
+  category: public.app-category.productivity
+  target:
+    - dmg
+    - zip
+  icon: resources/icon.png
+  extendInfo:
+    NSHighResolutionCapable: true
+    LSUIElement: false
+    NSSupportsAutomaticGraphicsSwitching: true
+win:
+  target:
+    - nsis
+  icon: resources/icon.png
+linux:
+  target:
+    - AppImage
+    - deb
+  category: Utility
+  icon: resources/icon.png
+  desktop:
+    entry:
+      StartupWMClass: Vellum
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  shortcutName: Vellum Quick Note
