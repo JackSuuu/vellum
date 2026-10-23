@@ -164,6 +164,9 @@ export const MuyaEditor = forwardRef<MuyaEditorHandle, MuyaEditorProps>(function
       footnote: false
     })
     muya.init()
+    // Muya hard-codes `autocorrect="false"`; re-enable the OS text correction
+    // that macOS / Windows provide for native text fields.
+    muya.domNode.setAttribute('autocorrect', 'on')
     // The parent de-duplicates, so the change fired by setContent is harmless.
     muya.on('json-change', () => onChangeRef.current(muya.getMarkdown()))
     muyaRef.current = muya
@@ -171,6 +174,18 @@ export const MuyaEditor = forwardRef<MuyaEditorHandle, MuyaEditorProps>(function
 
     const isMac = document.body.dataset.platform === 'darwin'
     const onKeyDown = (event: KeyboardEvent): void => {
+      const mod = isMac ? event.metaKey && !event.ctrlKey : event.ctrlKey && !event.metaKey
+      const undo = mod && event.code === 'KeyZ'
+      // ⌘⇧Z on macOS, Ctrl+Y (and Ctrl+Shift+Z) elsewhere.
+      const redo = mod && ((event.code === 'KeyZ' && event.shiftKey) || (!isMac && event.code === 'KeyY'))
+      if (undo || redo) {
+        event.preventDefault()
+        event.stopPropagation()
+        if (redo) muya.redo()
+        else muya.undo()
+        return
+      }
+
       const binding = findBinding(event, isMac)
       if (!binding) return
       event.preventDefault()

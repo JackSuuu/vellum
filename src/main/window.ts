@@ -1,4 +1,5 @@
-import { app, BrowserWindow, screen, shell } from 'electron'
+import { app, BrowserWindow, Menu, screen, shell } from 'electron'
+import type { MenuItemConstructorOptions } from 'electron'
 import { join } from 'node:path'
 import { DEFAULT_SETTINGS } from './store'
 
@@ -86,8 +87,55 @@ export function createMainWindow(): BrowserWindow {
     return { action: 'deny' }
   })
 
+  attachSpellcheckMenu(win)
+
   mainWindow = win
   return win
+}
+
+/**
+ * Electron does not show a native context menu by itself. Build one so the
+ * system spelling suggestions ("correct spelling" / "add to dictionary") work
+ * in the editor, alongside the usual cut/copy/paste items.
+ */
+function attachSpellcheckMenu(win: BrowserWindow): void {
+  win.webContents.on('context-menu', (_event, params) => {
+    const template: MenuItemConstructorOptions[] = []
+    const suggestions = params.dictionarySuggestions ?? []
+
+    if (params.misspelledWord) {
+      for (const suggestion of suggestions.slice(0, 5)) {
+        template.push({
+          label: suggestion,
+          click: () => win.webContents.replaceMisspelling(suggestion)
+        })
+      }
+      if (suggestions.length === 0) {
+        template.push({ label: 'No Spelling Suggestions', enabled: false })
+      }
+      template.push({ type: 'separator' })
+      template.push({
+        label: `Add “${params.misspelledWord}” to Dictionary`,
+        click: () => win.webContents.session.addWordToSpellCheckerDictionary(params.misspelledWord)
+      })
+      template.push({ type: 'separator' })
+    }
+
+    if (params.isEditable) {
+      template.push(
+        { role: 'cut', enabled: params.editFlags.canCut },
+        { role: 'copy', enabled: params.editFlags.canCopy },
+        { role: 'paste', enabled: params.editFlags.canPaste },
+        { type: 'separator' },
+        { role: 'selectAll' }
+      )
+    } else if (params.selectionText.trim()) {
+      template.push({ role: 'copy' })
+    }
+
+    if (template.length === 0) return
+    Menu.buildFromTemplate(template).popup({ window: win })
+  })
 }
 
 function positionWindow(win: BrowserWindow): void {

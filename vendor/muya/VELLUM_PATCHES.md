@@ -15,3 +15,7 @@ else is unmodified except:
    markers typed by CJK input methods at the start of a line (`【 】`, `［ ］`,
    `【x】`, `》`) are rewritten to `[ ]`, `[x]`, `>` before Muya's normal
    Markdown conversion, so task lists and quotes also work with a Chinese IME.
+4. `src/editor/index.ts` — when an undo / redo operation ends at
+   `...meta.checked`, the checkbox is an attachment of the `task-list-item`
+   rather than a child, so the generic `find('checked')` lookup missed it and
+   the circle kept its old state. Sync that attachment explicitly.

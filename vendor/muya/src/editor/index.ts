@@ -166,7 +166,20 @@ function drop(root: BlockNode, descent: JSONOpList, muya: Muya): BlockNode {
         else {
             switch (key) {
                 case 'checked': {
-                    ref?.update?.(comp.i, ChangeSource.Api);
+                    // `...meta.checked` ends on the task-list-item itself: its
+                    // checkbox is an attachment, not a child, so `find('checked')`
+                    // returns null. Sync the attachment explicitly instead of
+                    // leaving a stale circle behind after undo / redo.
+                    const host = container as BlockNode & {
+                        attachments?: { forEach: (cb: (node: BlockNode) => void) => void };
+                    };
+                    if (host.blockName === 'task-list-item' && host.attachments)
+                        host.attachments.forEach((node) => {
+                            if (node?.blockName === 'task-list-checkbox')
+                                node.update?.(comp.i, ChangeSource.Api);
+                        });
+                    else
+                        ref?.update?.(comp.i, ChangeSource.Api);
                     break;
                 }
 
