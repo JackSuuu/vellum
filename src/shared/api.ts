@@ -4,6 +4,7 @@ import type {
   LocationInfo,
   Note,
   NoteTemplate,
+  UseICloudResult,
   VaultStatus
 } from './types'
 
@@ -37,6 +38,7 @@ export interface VellumApi {
     pickAttachment(): Promise<string | null>
     openSettings(): Promise<void>
     chooseVaultFolder(): Promise<string | null>
+    useICloudVault(): Promise<UseICloudResult>
     revealNote(id: string): Promise<void>
     vaultStatus(): Promise<VaultStatus>
     /** The appearance the operating system currently uses. */

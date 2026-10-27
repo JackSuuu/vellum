@@ -8,7 +8,8 @@ import {
   statSync,
   writeFileSync
 } from 'node:fs'
-import { basename, join } from 'node:path'
+import { homedir } from 'node:os'
+import { basename, join, resolve, sep } from 'node:path'
 import { app } from 'electron'
 import type { Note } from '@shared/types'
 
@@ -40,6 +41,32 @@ export interface VaultNoteFile {
 
 export function defaultVaultPath(): string {
   return join(app.getPath('documents'), 'Vellum')
+}
+
+/** Root of the user's iCloud Drive folder, or null when it is not set up. */
+export function iCloudRoot(): string | null {
+  const root =
+    process.platform === 'darwin'
+      ? join(homedir(), 'Library', 'Mobile Documents', 'com~apple~CloudDocs')
+      : process.platform === 'win32'
+        ? join(homedir(), 'iCloudDrive')
+        : null
+  return root && existsSync(root) ? root : null
+}
+
+/** Vellum's folder inside iCloud Drive. */
+export function iCloudVaultPath(): string | null {
+  const root = iCloudRoot()
+  return root ? join(root, 'Vellum') : null
+}
+
+/** True when the folder is inside iCloud Drive (so iCloud syncs its files). */
+export function isInsideICloud(folder: string): boolean {
+  const root = iCloudRoot()
+  if (!root) return false
+  const base = resolve(root)
+  const target = resolve(folder)
+  return target === base || target.startsWith(`${base}${sep}`)
 }
 
 /** Make sure the vault folder exists and return it. */

@@ -95,4 +95,16 @@ export interface HotkeyStatus {
 export interface VaultStatus {
   path: string
   noteCount: number
+  /** Whether iCloud Drive is present on this machine. */
+  iCloudAvailable: boolean
+  /** Suggested Vellum folder inside iCloud Drive, if available. */
+  iCloudPath: string | null
+  /** Whether the active notes folder lives inside iCloud Drive. */
+  iCloudActive: boolean
+}
+
+export interface UseICloudResult {
+  ok: boolean
+  path?: string
+  error?: string
 }

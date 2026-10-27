@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
-import { FolderOpen, X } from 'lucide-react'
-import type { AppSettings } from '@shared/types'
+import { Cloud, FolderOpen, X } from 'lucide-react'
+import type { AppSettings, VaultStatus } from '@shared/types'
 import { ACCENTS } from '../lib/accent'
 
 interface SettingsPanelProps {
@@ -27,11 +27,37 @@ export function SettingsPanel({ settings, closing, onChange, onClose }: Settings
   const [recording, setRecording] = useState(false)
   const [hotkeyStatus, setHotkeyStatus] = useState<{ ok: boolean; text: string } | null>(null)
   const [vaultPath, setVaultPath] = useState('')
+  const [vault, setVault] = useState<VaultStatus | null>(null)
+  const [icloudBusy, setICloudBusy] = useState(false)
+  const [icloudError, setICloudError] = useState<string | null>(null)
   const template = settings.templates.find((t) => t.id === settings.defaultTemplateId) ?? settings.templates[0]
 
+  const refreshVault = async (): Promise<void> => {
+    const status = await window.vellum.app.vaultStatus()
+    setVault(status)
+    setVaultPath(status.path)
+  }
+
   useEffect(() => {
-    void window.vellum.app.vaultStatus().then((status) => setVaultPath(status.path))
+    void refreshVault()
   }, [])
+
+  const useICloud = async (): Promise<void> => {
+    setICloudBusy(true)
+    setICloudError(null)
+    try {
+      const result = await window.vellum.app.useICloudVault()
+      if (!result.ok) {
+        setICloudError(result.error ?? 'Could not use iCloud Drive.')
+        return
+      }
+      await refreshVault()
+    } catch {
+      setICloudError('Could not move the notes into iCloud Drive.')
+    } finally {
+      setICloudBusy(false)
+    }
+  }
 
   const record = (event: React.KeyboardEvent): void => {
     event.preventDefault()
@@ -209,13 +235,39 @@ export function SettingsPanel({ settings, closing, onChange, onClose }: Settings
               className="text-button"
               onClick={() =>
                 void window.vellum.app.chooseVaultFolder().then((folder) => {
-                  if (folder) setVaultPath(folder)
+                  if (folder) {
+                    setICloudError(null)
+                    void refreshVault()
+                  }
                 })
               }
             >
               Change…
             </button>
           </div>
+          {vault?.iCloudAvailable ? (
+            <>
+              <div className="setting-row">
+                <span className="folder-path" title={vault.iCloudPath ?? undefined}>
+                  <Cloud size={13} strokeWidth={2} />
+                  iCloud Drive
+                </span>
+                {vault.iCloudActive ? (
+                  <span className="icloud-state">Syncing</span>
+                ) : (
+                  <button type="button" className="text-button" disabled={icloudBusy} onClick={() => void useICloud()}>
+                    {icloudBusy ? 'Moving…' : 'Use iCloud Drive'}
+                  </button>
+                )}
+              </div>
+              <p className="setting-note">
+                {vault.iCloudActive
+                  ? 'Open this folder as a vault in Obsidian to read the notes on your phone.'
+                  : 'Use Change… to pick an existing Obsidian vault in iCloud Drive, or move the notes into iCloud Drive/Vellum.'}
+              </p>
+              {icloudError ? <p className="setting-note error">{icloudError}</p> : null}
+            </>
+          ) : null}
           <p className="setting-note">Every note is a Markdown file in this folder.</p>
         </div>
 

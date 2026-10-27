@@ -44,6 +44,8 @@ const api: VellumApi = {
     pickAttachment: () => ipcRenderer.invoke(IPC.appPickAttachment) as Promise<string | null>,
     openSettings: () => ipcRenderer.invoke(IPC.appOpenSettings) as Promise<void>,
     chooseVaultFolder: () => ipcRenderer.invoke(IPC.appChooseFolder) as Promise<string | null>,
+    useICloudVault: () =>
+      ipcRenderer.invoke(IPC.appUseICloud) as Promise<import('@shared/types').UseICloudResult>,
     revealNote: (id) => ipcRenderer.invoke(IPC.appRevealNote, id) as Promise<void>,
     vaultStatus: () => ipcRenderer.invoke(IPC.appVaultStatus) as Promise<VaultStatus>,
     systemTheme: () => ipcRenderer.invoke(IPC.appSystemTheme) as Promise<{ isDark: boolean }>

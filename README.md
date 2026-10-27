@@ -26,10 +26,18 @@ close it and carry on. Every note is a plain `.md` file in a folder you choose.
 - Liquid-glass UI with real macOS vibrancy.
 - **Light / dark / system appearance.** The default follows the operating
   system and switches live when you change it in the system settings.
+- **iCloud Drive sync.** On macOS and Windows, Settings → Notes folder can move
+  the vault into iCloud Drive. Because every note is a plain Markdown file, the
+  same folder can be opened by any iCloud-capable editor on another Mac or an
+  iPhone.
 
 ## Storage
 
-Notes live in `~/Documents/Vellum` (changeable in Settings):
+Notes live in `~/Documents/Vellum` (changeable in Settings). On macOS and
+Windows, **Settings → Notes folder → Use iCloud Drive** moves them to
+`iCloud Drive/Vellum` so iCloud keeps the files in sync. You can also use
+**Change…** to point Vellum at an existing Obsidian vault inside iCloud Drive;
+open that same folder as a vault in Obsidian on your phone.
 
 ```markdown
 ---

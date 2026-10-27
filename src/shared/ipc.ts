@@ -27,6 +27,7 @@ export const IPC = {
   appPickAttachment: 'app:pick-attachment',
   appWindowInfo: 'app:window-info',
   appChooseFolder: 'app:choose-folder',
+  appUseICloud: 'app:use-icloud',
   appRevealNote: 'app:reveal-note',
   appVaultStatus: 'app:vault-status',
   appSystemTheme: 'app:system-theme',

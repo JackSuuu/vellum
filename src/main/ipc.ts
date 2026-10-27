@@ -18,6 +18,7 @@ import {
   saveNote,
   vaultPathForDisplay
 } from './notes'
+import { iCloudVaultPath, isInsideICloud } from './vault'
 import {
   getBaseWidth,
   getMainWindow,
@@ -299,15 +300,43 @@ export function registerIpcHandlers(): void {
     return folder
   })
 
+  ipcMain.handle(IPC.appUseICloud, () => {
+    const folder = iCloudVaultPath()
+    if (!folder) {
+      return {
+        ok: false,
+        error:
+          process.platform === 'darwin'
+            ? 'Turn on iCloud Drive in System Settings first.'
+            : 'iCloud Drive was not found on this computer.'
+      }
+    }
+    try {
+      changeVault(folder)
+      broadcast(IPC.eventNoteChanged, getStore().read().currentNoteId)
+      return { ok: true, path: folder }
+    } catch (error) {
+      console.error('[vault] failed to switch to iCloud Drive:', error)
+      return { ok: false, error: 'Could not move the notes into iCloud Drive.' }
+    }
+  })
+
   ipcMain.handle(IPC.appRevealNote, (_e, id: string) => {
     const path = findNoteFile(id)
     if (path) shell.showItemInFolder(path)
   })
 
-  ipcMain.handle(IPC.appVaultStatus, () => ({
-    path: vaultPathForDisplay(),
-    noteCount: allNotes().length
-  }))
+  ipcMain.handle(IPC.appVaultStatus, () => {
+    const path = vaultPathForDisplay()
+    const iCloudPath = iCloudVaultPath()
+    return {
+      path,
+      noteCount: allNotes().length,
+      iCloudAvailable: iCloudPath !== null,
+      iCloudPath,
+      iCloudActive: isInsideICloud(path)
+    }
+  })
 
   ipcMain.handle(IPC.appSystemTheme, () => ({
     isDark: nativeTheme.shouldUseDarkColors
