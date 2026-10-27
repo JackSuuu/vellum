@@ -156,6 +156,9 @@ export const MuyaEditor = forwardRef<MuyaEditorHandle, MuyaEditorProps>(function
       autoPairMarkdownSyntax: false,
       autoPairQuote: true,
       bulletListMarker: '-',
+      // Obsidian writes one tab per nesting level; match it so the same vault
+      // looks identical in both apps.
+      listIndentation: 'tab',
       preferLooseListItem: false,
       hideQuickInsertHint: false,
       spellcheckEnabled: true,

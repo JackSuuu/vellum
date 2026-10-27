@@ -187,6 +187,19 @@ try {
       const expected = input === '```' ? '```\nZ\n```' : input === '---' ? '---\n\nZ' : input + 'Z'
       check(`type ${JSON.stringify(input).padEnd(22)} renders ${selector}`, res.ok && res.md.trim() === expected, JSON.stringify(res.md))
     }
+    // Nested lists are written with Obsidian's one-tab-per-level indentation.
+    const nested = JSON.parse(
+      await evaluate(`(() => {
+        const NL = String.fromCharCode(10), TAB = String.fromCharCode(9)
+        window.__muya.setContent(['- [ ] parent', '  - [ ] child', '    - [ ] grand'].join(NL))
+        return JSON.stringify({
+          md: window.__muya.getMarkdown(),
+          expected: ['- [ ] parent', TAB + '- [ ] child', TAB + TAB + '- [ ] grand', ''].join(NL)
+        })
+      })()`)
+    )
+    check('nested task lists use tab indentation', nested.md === nested.expected, JSON.stringify(nested.md))
+
     // "/" on an empty line opens MarkText's quick-insert menu.
     await evaluate(`window.__muya.setContent(''); true`)
     await sleep(80)

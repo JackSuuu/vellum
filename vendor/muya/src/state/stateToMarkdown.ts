@@ -21,6 +21,7 @@ import type {
 /* eslint-disable no-fallthrough */
 import { deepClone } from '../utils';
 import { githubAlertMarker } from '../utils/githubAlerts';
+import { indentationWidth, indentToTabStop, indentWithTabs, removeIndent } from '../utils/indentation';
 
 import logger from '../utils/logger';
 import stringWidth from '../utils/stringWidth';
@@ -61,7 +62,11 @@ export default class ExportMarkdown {
         this._isLooseParentList = true;
 
         this._listIndentation = 'number';
-        if (listIndentation === 'dfm') {
+        if (listIndentation === 'tab') {
+            this._listIndentation = 'tab';
+            this._listIndentationCount = 4;
+        }
+        else if (listIndentation === 'dfm') {
             this._listIndentation = 'dfm';
             this._listIndentationCount = 4;
         }
@@ -582,7 +587,6 @@ export default class ExportMarkdown {
         state: IListItemState | ITaskListItemState,
         indent: string,
     ) {
-        const result = [];
         const listInfo = this._listType[this._listType.length - 1];
         const marker = 'marker' in listInfo ? listInfo.marker : undefined;
         const delimiter = 'delimiter' in listInfo ? listInfo.delimiter : undefined;
@@ -613,7 +617,9 @@ export default class ExportMarkdown {
             itemMarker = '- ';
         }
 
-        const newIndent = indent + ' '.repeat(itemMarker.length);
+        const layout = this._listItemIndent(indent, itemMarker);
+        indent = layout.indent;
+        const { newIndent, container, contentColumn } = layout;
 
         // Additional nesting indentation beyond the parent item’s content column;
         // CommonMark already permits nesting at that column.
@@ -635,13 +641,30 @@ export default class ExportMarkdown {
         if (!children.length)
             return `${indent}${itemMarker}\n`;
 
-        result.push(`${indent}${itemMarker}`);
-        result.push(
-            this._convertStatesToMarkdown(children, newIndent, listIndent).substring(
-                newIndent.length,
-            ),
-        );
+        const content = this._convertStatesToMarkdown(children, newIndent, listIndent);
+        const firstContent = content.startsWith(newIndent)
+            ? content.slice(newIndent.length)
+            : removeIndent(content.slice(container.length), contentColumn, indentationWidth(container));
 
-        return result.join('');
+        return `${indent}${itemMarker}${firstContent}`;
+    }
+
+    private _listItemIndent(indent: string, itemMarker: string) {
+        const quoteEnd = indent.lastIndexOf('>');
+        const container = quoteEnd < 0 ? '' : `${indent.slice(0, quoteEnd + 1)} `;
+        const startColumn = indentationWidth(container);
+        if (this._listIndentation === 'tab') {
+            const prefix = indent.slice(container.length);
+            // Marked restarts tab columns after each "> "; satisfy that origin too.
+            const quotePadding = container && prefix ? Math.max(0, 2 - startColumn % 4) : 0;
+            indent = container + (container
+                ? indentWithTabs(indentationWidth(prefix, startColumn) + quotePadding, startColumn)
+                : indentToTabStop(prefix));
+        }
+        const contentColumn = indentationWidth(indent + itemMarker) - startColumn;
+        const newIndent = this._listIndentation === 'tab'
+            ? container + indentWithTabs(contentColumn, startColumn)
+            : indent + ' '.repeat(itemMarker.length);
+        return { indent, newIndent, container, contentColumn };
     }
 }

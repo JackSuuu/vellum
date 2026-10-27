@@ -19,3 +19,6 @@ else is unmodified except:
    `...meta.checked`, the checkbox is an attachment of the `task-list-item`
    rather than a child, so the generic `find('checked')` lookup missed it and
    the circle kept its old state. Sync that attachment explicitly.
+5. `src/state/stateToMarkdown.ts`, `src/utils/indentation.ts`,
+   `src/types.ts` — port upstream's tab list indentation so nested lists are
+   written with one tab per level (Obsidian's format) instead of spaces.

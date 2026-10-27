@@ -37,7 +37,8 @@ Notes live in `~/Documents/Vellum` (changeable in Settings). On macOS and
 Windows, **Settings → Notes folder → Use iCloud Drive** moves them to
 `iCloud Drive/Vellum` so iCloud keeps the files in sync. You can also use
 **Change…** to point Vellum at an existing Obsidian vault inside iCloud Drive;
-open that same folder as a vault in Obsidian on your phone.
+open that same folder as a vault in Obsidian on your phone. Nested lists are
+written with one tab per level, matching Obsidian's indentation.
 
 ```markdown
 ---

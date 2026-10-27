@@ -23,7 +23,7 @@ export interface IMuyaOptions {
     orderListDelimiter: string;
     tabSize: number;
     codeBlockLineNumbers: boolean;
-    listIndentation: number;
+    listIndentation: number | 'dfm' | 'tab';
     frontMatter: boolean;
     frontmatterType: string; // '-' | '+' | ';' | '{';
     mermaidTheme: string;
