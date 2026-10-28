@@ -19,7 +19,8 @@ close it and carry on. Every note is a plain `.md` file in a folder you choose.
   created; *Set end time* stamps the end.
 - **Global shortcut** (default `⌘.`), show/hide from anywhere. The window stays
   put when you click other apps; closing only hides it.
-- **All notes** (`⌘K` / `⌘P`), **new note** (`⌘N`), **settings** (`⌘,`), hide (`⌘W` / `Esc`).
+- **All notes** (`⌘K` / `⌘P`) sorted by note date, with a one-click newest / oldest
+  toggle; **new note** (`⌘N`), **settings** (`⌘,`), hide (`⌘W` / `Esc`).
 - **Location** on its own line under the timestamp, editable.
 - **Delete** a note from the switcher with `⌘⌫` (press twice within two seconds
   to confirm).

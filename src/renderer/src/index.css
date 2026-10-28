@@ -695,6 +695,25 @@ button.meta-pill:hover {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.notes-sort {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin-right: -2px;
+  border-radius: 6px;
+  color: var(--ink-3);
+  transition: color 120ms ease, background 120ms ease;
+}
+.notes-sort:hover {
+  color: var(--ink);
+  background: var(--hover-bg-strong);
+}
+.notes-sort[data-order='oldest'] {
+  color: var(--accent-ink);
+  background: var(--accent-soft);
+}
 .notes-delete {
   flex: none;
   min-width: 28px;

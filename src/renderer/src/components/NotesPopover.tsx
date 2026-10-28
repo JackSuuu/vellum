@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Search, Trash2 } from 'lucide-react'
+import { CalendarArrowDown, CalendarArrowUp, Search, Trash2 } from 'lucide-react'
 import type { Note } from '@shared/types'
 import { formatRelative, formatTime } from '../lib/format'
 
@@ -39,6 +39,7 @@ function DateTile({ ms }: { ms: number }): React.JSX.Element {
 /** ⌘K switcher: type to filter, ↑/↓ to move, ↩ to open, esc to close. */
 export function NotesPopover({ notes, currentId, closing, onOpen, onDelete, onClose }: NotesPopoverProps): React.JSX.Element {
   const [query, setQuery] = useState('')
+  const [sort, setSort] = useState<'newest' | 'oldest'>('newest')
   const [armed, setArmed] = useState<string | null>(null)
   const [index, setIndex] = useState(0)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -62,9 +63,11 @@ export function NotesPopover({ notes, currentId, closing, onOpen, onDelete, onCl
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
-    if (!q) return notes
-    return notes.filter((n) => n.title.toLowerCase().includes(q) || n.markdown.toLowerCase().includes(q))
-  }, [notes, query])
+    const list = q
+      ? notes.filter((n) => n.title.toLowerCase().includes(q) || n.markdown.toLowerCase().includes(q))
+      : [...notes]
+    return list.sort((a, b) => (sort === 'newest' ? b.createdAt - a.createdAt : a.createdAt - b.createdAt))
+  }, [notes, query, sort])
 
   // Start on the note after the current one, so ⌘K ↩ jumps to the previous note.
   useEffect(() => {
@@ -116,6 +119,17 @@ export function NotesPopover({ notes, currentId, closing, onOpen, onDelete, onCl
               }
             }}
           />
+          <button
+            type="button"
+            className="notes-sort"
+            data-order={sort}
+            aria-label={sort === 'newest' ? 'Sort by date, newest first' : 'Sort by date, oldest first'}
+            title={sort === 'newest' ? 'Newest first — click for oldest first' : 'Oldest first — click for newest first'}
+            onMouseDown={(e) => e.preventDefault()}
+            onClick={() => setSort((s) => (s === 'newest' ? 'oldest' : 'newest'))}
+          >
+            {sort === 'newest' ? <CalendarArrowDown size={14} strokeWidth={2} /> : <CalendarArrowUp size={14} strokeWidth={2} />}
+          </button>
           <kbd className="kbd">⌘K</kbd>
         </div>
 

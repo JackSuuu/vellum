@@ -292,6 +292,16 @@ try {
     await evaluate(`document.querySelector('[data-probe=notes-button]').click(); true`)
     await sleep(500)
     await shot('notes')
+    const noteOrder = () => evaluate(`JSON.stringify([...document.querySelectorAll('.notes-row')].map(r => r.querySelector('.notes-title')?.firstChild?.textContent?.trim()))`)
+    const orderBefore = JSON.parse(await noteOrder())
+    await evaluate(`document.querySelector('.notes-sort').click(); true`)
+    await sleep(250)
+    const orderAfter = JSON.parse(await noteOrder())
+    check(
+      'date sort button reverses the note order',
+      JSON.stringify(orderAfter) === JSON.stringify([...orderBefore].reverse()),
+      JSON.stringify({ orderBefore, orderAfter })
+    )
     await evaluate(`[...document.querySelectorAll('.notes-open')].find(b => b.textContent.includes('Groceries'))?.click(); true`)
     await sleep(500)
     const back = await evaluate('window.__muya.getMarkdown()')
