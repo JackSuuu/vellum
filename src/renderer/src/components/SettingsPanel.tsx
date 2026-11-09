@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react'
+import { motion } from 'motion/react'
 import { Cloud, FolderOpen, X } from 'lucide-react'
 import type { AppSettings, VaultStatus } from '@shared/types'
 import { ACCENTS } from '../lib/accent'
 
 interface SettingsPanelProps {
   settings: AppSettings
-  closing: boolean
   onChange: (patch: Partial<AppSettings>) => void
   onClose: () => void
 }
@@ -22,7 +22,7 @@ function prettyAccelerator(accelerator: string, isMac: boolean): string {
     .replace(/\+/g, '')
 }
 
-export function SettingsPanel({ settings, closing, onChange, onClose }: SettingsPanelProps): React.JSX.Element {
+export function SettingsPanel({ settings, onChange, onClose }: SettingsPanelProps): React.JSX.Element {
   const isMac = document.body.dataset.platform === 'darwin'
   const [recording, setRecording] = useState(false)
   const [hotkeyStatus, setHotkeyStatus] = useState<{ ok: boolean; text: string } | null>(null)
@@ -96,13 +96,35 @@ export function SettingsPanel({ settings, closing, onChange, onClose }: Settings
   }
 
   return (
-    <div className="popover-backdrop" data-closing={closing} onMouseDown={onClose}>
-      <div className="glass-panel settings-panel" data-probe="settings-panel" onMouseDown={(e) => e.stopPropagation()}>
+    <motion.div
+      className="popover-backdrop"
+      onMouseDown={onClose}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.14 }}
+    >
+      <motion.div
+        className="glass-panel settings-panel"
+        data-probe="settings-panel"
+        onMouseDown={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, y: -8, scale: 0.985 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: -6, scale: 0.99 }}
+        transition={{ type: 'spring', stiffness: 520, damping: 38, mass: 0.7 }}
+      >
         <div className="panel-head">
           <h2>Settings</h2>
-          <button type="button" className="glass-button small" aria-label="Close settings" onClick={onClose}>
+          <motion.button
+            type="button"
+            className="glass-button small"
+            aria-label="Close settings"
+            onClick={onClose}
+            whileTap={{ scale: 0.9 }}
+            transition={{ type: 'spring', stiffness: 650, damping: 30 }}
+          >
             <X size={13} strokeWidth={2.4} />
-          </button>
+          </motion.button>
         </div>
 
         <div className="setting-group">
@@ -274,8 +296,8 @@ export function SettingsPanel({ settings, closing, onChange, onClose }: Settings
         <button type="button" className="text-button danger" onClick={() => void window.vellum.app.quit()}>
           Quit Vellum
         </button>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }
 

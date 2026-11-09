@@ -20,8 +20,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   hideOnBlur: false,
   opacity: 0.86,
   theme: 'system',
-  width: 440,
-  height: 620,
+  width: 520,
+  height: 700,
   locale: 'en-US',
   templates: [DEFAULT_TEMPLATE],
   defaultTemplateId: DEFAULT_TEMPLATE.id,
@@ -70,6 +70,12 @@ class JsonStore {
       }
       // Older builds could hide the window on blur; the quick note must stay put.
       this.data.settings.hideOnBlur = false
+      // Widen installs that still use the original 440x620 first-run window.
+      // Users who resized the window keep their own dimensions.
+      if (this.data.settings.width === 440 && this.data.settings.height === 620) {
+        this.data.settings.width = DEFAULT_SETTINGS.width
+        this.data.settings.height = DEFAULT_SETTINGS.height
+      }
       // The old default template repeated the title, time and place in the body.
       for (const template of this.data.settings.templates) {
         if (template.content === LEGACY_TEMPLATE_BODY) {

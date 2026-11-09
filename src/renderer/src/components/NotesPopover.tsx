@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 import { CalendarArrowDown, CalendarArrowUp, Search, Trash2 } from 'lucide-react'
 import type { Note } from '@shared/types'
 import { formatRelative, formatTime } from '../lib/format'
@@ -6,7 +7,6 @@ import { formatRelative, formatTime } from '../lib/format'
 interface NotesPopoverProps {
   notes: Note[]
   currentId: string
-  closing: boolean
   onOpen: (note: Note) => void
   onDelete: (note: Note) => void
   onClose: () => void
@@ -37,7 +37,7 @@ function DateTile({ ms }: { ms: number }): React.JSX.Element {
 }
 
 /** ⌘K switcher: type to filter, ↑/↓ to move, ↩ to open, esc to close. */
-export function NotesPopover({ notes, currentId, closing, onOpen, onDelete, onClose }: NotesPopoverProps): React.JSX.Element {
+export function NotesPopover({ notes, currentId, onOpen, onDelete, onClose }: NotesPopoverProps): React.JSX.Element {
   const [query, setQuery] = useState('')
   const [sort, setSort] = useState<'newest' | 'oldest'>('newest')
   const [armed, setArmed] = useState<string | null>(null)
@@ -87,8 +87,23 @@ export function NotesPopover({ notes, currentId, closing, onOpen, onDelete, onCl
   }, [index])
 
   return (
-    <div className="popover-backdrop" data-closing={closing} onMouseDown={onClose}>
-      <div className="glass-panel notes-popover" data-probe="notes-popover" onMouseDown={(e) => e.stopPropagation()}>
+    <motion.div
+      className="popover-backdrop"
+      onMouseDown={onClose}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.14 }}
+    >
+      <motion.div
+        className="glass-panel notes-popover"
+        data-probe="notes-popover"
+        onMouseDown={(e) => e.stopPropagation()}
+        initial={{ opacity: 0, y: -8, scale: 0.985 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: -6, scale: 0.99 }}
+        transition={{ type: 'spring', stiffness: 520, damping: 38, mass: 0.7 }}
+      >
         <div className="search-field">
           <Search size={14} strokeWidth={2.2} />
           <input
@@ -119,7 +134,7 @@ export function NotesPopover({ notes, currentId, closing, onOpen, onDelete, onCl
               }
             }}
           />
-          <button
+          <motion.button
             type="button"
             className="notes-sort"
             data-order={sort}
@@ -127,56 +142,76 @@ export function NotesPopover({ notes, currentId, closing, onOpen, onDelete, onCl
             title={sort === 'newest' ? 'Newest first — click for oldest first' : 'Oldest first — click for newest first'}
             onMouseDown={(e) => e.preventDefault()}
             onClick={() => setSort((s) => (s === 'newest' ? 'oldest' : 'newest'))}
+            whileTap={{ scale: 0.88 }}
+            transition={{ type: 'spring', stiffness: 650, damping: 30 }}
           >
-            {sort === 'newest' ? <CalendarArrowDown size={14} strokeWidth={2} /> : <CalendarArrowUp size={14} strokeWidth={2} />}
-          </button>
+            <motion.span
+              key={sort}
+              initial={{ rotate: sort === 'newest' ? -24 : 24, opacity: 0 }}
+              animate={{ rotate: 0, opacity: 1 }}
+              transition={{ duration: 0.16 }}
+            >
+              {sort === 'newest' ? <CalendarArrowDown size={14} strokeWidth={2} /> : <CalendarArrowUp size={14} strokeWidth={2} />}
+            </motion.span>
+          </motion.button>
           <kbd className="kbd">⌘K</kbd>
         </div>
 
         <ul className="notes-list" ref={listRef}>
           {filtered.length === 0 ? <li className="notes-empty">No notes</li> : null}
-          {filtered.map((note, i) => (
-            <li
-              key={note.id}
-              className="notes-row"
-              data-index={i}
-              data-selected={i === index}
-              data-active={note.id === currentId}
-              data-armed={armed === note.id}
-              onMouseMove={() => setIndex(i)}
-            >
-              <button type="button" className="notes-open" onClick={() => onOpen(note)}>
-                <DateTile ms={note.createdAt} />
-                <span className="notes-text">
-                  <span className="notes-title">
-                    {note.title || 'Untitled'}
-                    {note.id === currentId ? <span className="notes-current">current</span> : null}
-                  </span>
-                  <span className="notes-when">
-                    {weekday.format(new Date(note.createdAt))} · {formatTime(new Date(note.createdAt))}
-                    <span className="notes-edited">edited {formatRelative(note.updatedAt)}</span>
-                  </span>
-                  <span className="notes-preview">
-                    {armed === note.id ? 'Press ⌘⌫ again to delete' : preview(note.markdown) || 'Empty note'}
-                  </span>
-                </span>
-              </button>
-              <button
-                type="button"
-                className="notes-delete"
+          <AnimatePresence initial={false}>
+            {filtered.map((note, i) => (
+              <motion.li
+                layout
+                key={note.id}
+                className="notes-row"
+                data-index={i}
+                data-selected={i === index}
+                data-active={note.id === currentId}
                 data-armed={armed === note.id}
-                aria-label="Delete note"
-                title={armed === note.id ? 'Click again to delete' : 'Delete'}
-                onClick={() => {
-                  if (armed === note.id) onDelete(note)
-                  else setArmed(note.id)
+                onMouseMove={() => setIndex(i)}
+                initial={{ opacity: 0, y: 4 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{
+                  layout: { type: 'spring', stiffness: 480, damping: 42 },
+                  opacity: { duration: 0.14 },
+                  y: { duration: 0.14 }
                 }}
-                onMouseLeave={() => setArmed((a) => (a === note.id ? null : a))}
               >
-                {armed === note.id ? 'Delete' : <Trash2 size={13} strokeWidth={2} />}
-              </button>
-            </li>
-          ))}
+                <button type="button" className="notes-open" onClick={() => onOpen(note)}>
+                  <DateTile ms={note.createdAt} />
+                  <span className="notes-text">
+                    <span className="notes-title">
+                      {note.title || 'Untitled'}
+                      {note.id === currentId ? <span className="notes-current">current</span> : null}
+                    </span>
+                    <span className="notes-when">
+                      {weekday.format(new Date(note.createdAt))} · {formatTime(new Date(note.createdAt))}
+                      <span className="notes-edited">edited {formatRelative(note.updatedAt)}</span>
+                    </span>
+                    <span className="notes-preview">
+                      {armed === note.id ? 'Press ⌘⌫ again to delete' : preview(note.markdown) || 'Empty note'}
+                    </span>
+                  </span>
+                </button>
+                <button
+                  type="button"
+                  className="notes-delete"
+                  data-armed={armed === note.id}
+                  aria-label="Delete note"
+                  title={armed === note.id ? 'Click again to delete' : 'Delete'}
+                  onClick={() => {
+                    if (armed === note.id) onDelete(note)
+                    else setArmed(note.id)
+                  }}
+                  onMouseLeave={() => setArmed((a) => (a === note.id ? null : a))}
+                >
+                  {armed === note.id ? 'Delete' : <Trash2 size={13} strokeWidth={2} />}
+                </button>
+              </motion.li>
+            ))}
+          </AnimatePresence>
         </ul>
         <div className="notes-hint">
           <span>↑↓ select</span>
@@ -184,7 +219,7 @@ export function NotesPopover({ notes, currentId, closing, onOpen, onDelete, onCl
           <span>⌘⌫ delete</span>
           <span>esc close</span>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   )
 }

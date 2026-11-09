@@ -1,7 +1,7 @@
 import type { AccentColor } from '@shared/types'
 
 export const ACCENTS: Record<AccentColor, { label: string; color: string; ink: string }> = {
-  purple: { label: 'Purple', color: '#8b5cf6', ink: '#6d3fe0' },
+  purple: { label: 'Purple', color: '#5e6ad2', ink: '#4f5ac2' },
   blue: { label: 'Blue', color: '#0a84ff', ink: '#0a6cdc' },
   pink: { label: 'Pink', color: '#ec4899', ink: '#cf2c7d' },
   orange: { label: 'Orange', color: '#f59e0b', ink: '#c77800' },
@@ -16,15 +16,14 @@ function rgba(hex: string, alpha: number): string {
 
 /** Set the accent on <html>, so Muya's floating menus (attached to <body>) follow it too. */
 export function applyAccent(accent: AccentColor | undefined): void {
-  const { color, ink } = ACCENTS[accent ?? 'purple'] ?? ACCENTS.purple
+  const { color } = ACCENTS[accent ?? 'purple'] ?? ACCENTS.purple
   const root = document.documentElement.style
   root.setProperty('--accent', color)
-  root.setProperty('--accent-ink', ink)
   root.setProperty('--accent-soft', rgba(color, 0.14))
   root.setProperty('--accent-ring', rgba(color, 0.38))
-  // Muya (MarkText editor) theme variables
+  // Muya (MarkText editor) theme variables. `--accent-ink` and `--link-color`
+  // are derived from `--accent` in CSS so they adapt to light/dark mode.
   root.setProperty('--theme-color', color)
   root.setProperty('--highlight-color', rgba(color, 0.25))
   root.setProperty('--selection-color', rgba(color, 0.22))
-  root.setProperty('--link-color', ink)
 }

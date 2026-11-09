@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { AnimatePresence, MotionConfig, motion } from 'motion/react'
 import type { AppSettings, Note, SaveState } from '@shared/types'
 import { MuyaEditor, type MuyaEditorHandle } from './components/MuyaEditor'
 import { NoteHeader } from './components/NoteHeader'
@@ -26,30 +27,12 @@ export default function App(): React.JSX.Element {
   const [settings, setSettings] = useState<AppSettings | null>(null)
   const [saveState, setSaveState] = useState<SaveState>('idle')
   const [panel, setPanelState] = useState<'none' | 'notes' | 'settings'>('none')
-  const [closing, setClosing] = useState(false)
   const sheetRef = useRef<HTMLElement>(null)
-  const closeTimer = useRef<number | null>(null)
 
-  const panelRef = useRef(panel)
-  panelRef.current = panel
-
-  /** Panels fade out before they are removed. */
+  /** Panels animate themselves out through AnimatePresence. */
   type Panel = 'none' | 'notes' | 'settings'
   const setPanel = useCallback((next: Panel | ((p: Panel) => Panel)) => {
-    const prev = panelRef.current
-    const target = typeof next === 'function' ? next(prev) : next
-    if (closeTimer.current) window.clearTimeout(closeTimer.current)
-    closeTimer.current = null
-    if (target === 'none' && prev !== 'none') {
-      setClosing(true)
-      closeTimer.current = window.setTimeout(() => {
-        setClosing(false)
-        setPanelState('none')
-      }, 140)
-      return
-    }
-    setClosing(false)
-    setPanelState(target)
+    setPanelState((prev) => (typeof next === 'function' ? next(prev) : next))
   }, [])
 
   const editorRef = useRef<MuyaEditorHandle>(null)
@@ -133,8 +116,8 @@ export default function App(): React.JSX.Element {
     void (async () => {
       const [loadedSettings, current] = await Promise.all([window.vellum.settings.get(), window.vellum.notes.current()])
       setSettings(loadedSettings)
-      applyAccent(loadedSettings.accent)
       applyTheme(loadedSettings.theme ?? 'system')
+      applyAccent(loadedSettings.accent)
       if (current) {
         savedRef.current = { id: current.id, markdown: current.markdown }
         setNote(current)
@@ -149,8 +132,8 @@ export default function App(): React.JSX.Element {
       window.vellum.on.openSettings(() => setPanel('settings')),
       window.vellum.on.settingsChanged((next) => {
         setSettings(next)
-        applyAccent(next.accent)
         applyTheme(next.theme ?? 'system')
+        applyAccent(next.accent)
       }),
       window.vellum.on.noteChanged(async (id) => {
         // Saves are never echoed back, so this is always another note
@@ -256,49 +239,81 @@ export default function App(): React.JSX.Element {
   }
 
   return (
-    <div className="shell" data-platform={platform} data-font={settings.fontFamily ?? 'sans'}>
-      <TitleBar
-        platform={platform}
-        pinned={settings.alwaysOnTop}
-        notesOpen={panel === 'notes'}
-        settingsOpen={panel === 'settings'}
-        onClose={() => void hide()}
-        onMinimize={() => void window.vellum.app.minimize()}
-        onTogglePin={() => void updateSettings({ alwaysOnTop: !settings.alwaysOnTop })}
-        onToggleNotes={() => {
-          void refreshList()
-          setPanel((p) => (p === 'notes' ? 'none' : 'notes'))
-        }}
-        onNewNote={() => void newNote()}
-        onToggleSettings={() => setPanel((p) => (p === 'settings' ? 'none' : 'settings'))}
-      />
-
-      <main className="sheet" ref={sheetRef}>
-        <NoteHeader note={note} onRename={(t) => void rename(t)} onSetStarted={(t) => void setStarted(t)} onSetEnded={(e) => void setEnded(e)} onEnterBody={() => editorRef.current?.focus()} />
-        <div className="editor-scroll" data-probe="editor">
-          <MuyaEditor ref={editorRef} noteKey={note.id} markdown={note.markdown} fontSize={settings.fontSize} onChange={onEditorChange} />
-        </div>
-      </main>
-
-      <footer className="statusbar" data-probe="statusbar">
-        <span>{wordLabel(countWords(note.markdown))}</span>
-        <span className="status-dot" data-state={saveState} />
-        <span>{saveState === 'saving' ? 'Saving…' : saveState === 'error' ? 'Not saved' : 'Saved'}</span>
-      </footer>
-
-      {panel === 'notes' ? (
-        <NotesPopover
-          notes={notes}
-          currentId={note.id}
-          closing={closing}
-          onOpen={(n) => void open(n)}
-          onDelete={(n) => void deleteNote(n)}
-          onClose={() => setPanel('none')}
+    <MotionConfig reducedMotion="user">
+      <div className="shell" data-platform={platform} data-font={settings.fontFamily ?? 'sans'}>
+        <TitleBar
+          platform={platform}
+          pinned={settings.alwaysOnTop}
+          notesOpen={panel === 'notes'}
+          settingsOpen={panel === 'settings'}
+          onClose={() => void hide()}
+          onMinimize={() => void window.vellum.app.minimize()}
+          onTogglePin={() => void updateSettings({ alwaysOnTop: !settings.alwaysOnTop })}
+          onToggleNotes={() => {
+            void refreshList()
+            setPanel((p) => (p === 'notes' ? 'none' : 'notes'))
+          }}
+          onNewNote={() => void newNote()}
+          onToggleSettings={() => setPanel((p) => (p === 'settings' ? 'none' : 'settings'))}
         />
-      ) : null}
-      {panel === 'settings' ? (
-        <SettingsPanel settings={settings} closing={closing} onChange={(p) => void updateSettings(p)} onClose={() => setPanel('none')} />
-      ) : null}
-    </div>
+
+        <main className="sheet" ref={sheetRef}>
+          <NoteHeader
+            note={note}
+            onRename={(t) => void rename(t)}
+            onSetStarted={(t) => void setStarted(t)}
+            onSetEnded={(e) => void setEnded(e)}
+            onEnterBody={() => editorRef.current?.focus()}
+          />
+          <div className="editor-scroll" data-probe="editor">
+            <MuyaEditor ref={editorRef} noteKey={note.id} markdown={note.markdown} fontSize={settings.fontSize} onChange={onEditorChange} />
+          </div>
+        </main>
+
+        <footer className="statusbar" data-probe="statusbar">
+          <span>{wordLabel(countWords(note.markdown))}</span>
+          <motion.span
+            key={saveState}
+            className="status-dot"
+            data-state={saveState}
+            initial={{ scale: 0.5, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: 'spring', stiffness: 650, damping: 30 }}
+          />
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.span
+              key={saveState}
+              initial={{ opacity: 0, y: 2 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -2 }}
+              transition={{ duration: 0.12 }}
+            >
+              {saveState === 'saving' ? 'Saving…' : saveState === 'error' ? 'Not saved' : 'Saved'}
+            </motion.span>
+          </AnimatePresence>
+        </footer>
+
+        <AnimatePresence mode="wait">
+          {panel === 'notes' ? (
+            <NotesPopover
+              key="notes"
+              notes={notes}
+              currentId={note.id}
+              onOpen={(n) => void open(n)}
+              onDelete={(n) => void deleteNote(n)}
+              onClose={() => setPanel('none')}
+            />
+          ) : null}
+          {panel === 'settings' ? (
+            <SettingsPanel
+              key="settings"
+              settings={settings}
+              onChange={(p) => void updateSettings(p)}
+              onClose={() => setPanel('none')}
+            />
+          ) : null}
+        </AnimatePresence>
+      </div>
+    </MotionConfig>
   )
 }

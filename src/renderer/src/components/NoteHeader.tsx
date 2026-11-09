@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 import { CalendarClock, Flag, MapPin, X } from 'lucide-react'
 import type { Note } from '@shared/types'
 import { formatTime } from '../lib/format'
@@ -55,7 +56,15 @@ function TimeEditor({
   }
 
   return (
-    <div className="time-editor" ref={ref} data-probe="time-editor">
+    <motion.div
+      className="time-editor"
+      ref={ref}
+      data-probe="time-editor"
+      initial={{ opacity: 0, y: -4, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -4, scale: 0.98 }}
+      transition={{ type: 'spring', stiffness: 560, damping: 36 }}
+    >
       <div className="time-editor-label">{label}</div>
       <input
         type="datetime-local"
@@ -76,7 +85,7 @@ function TimeEditor({
           Done
         </button>
       </div>
-    </div>
+    </motion.div>
   )
 }
 
@@ -118,19 +127,23 @@ export function NoteHeader({ note, onRename, onSetStarted, onSetEnded, onEnterBo
 
       <div className="note-meta" data-probe="note-meta">
         <span className="meta-anchor">
-          <button
+          <motion.button
             type="button"
             className="meta-pill meta-pill-start"
             data-probe="start-time"
             title="Start time — filled in automatically, click to change"
             onClick={() => setEditing((e) => (e === 'start' ? null : 'start'))}
+            whileTap={{ scale: 0.97 }}
+            transition={{ type: 'spring', stiffness: 650, damping: 32 }}
           >
             <CalendarClock size={14} strokeWidth={2} />
             {formatDay(started)} · {formatTime(started)}
-          </button>
-          {editing === 'start' ? (
-            <TimeEditor label="Start" value={note.createdAt} onSave={onSetStarted} onClose={() => setEditing(null)} />
-          ) : null}
+          </motion.button>
+          <AnimatePresence>
+            {editing === 'start' ? (
+              <TimeEditor key="start" label="Start" value={note.createdAt} onSave={onSetStarted} onClose={() => setEditing(null)} />
+            ) : null}
+          </AnimatePresence>
         </span>
 
         <span className="meta-arrow">→</span>
@@ -152,20 +165,24 @@ export function NoteHeader({ note, onRename, onSetStarted, onSetEnded, onEnterBo
               </button>
             </span>
           ) : (
-            <button
+            <motion.button
               type="button"
               className="meta-pill"
               data-probe="end-time"
               title="Stamp the current time as the end of this note"
               onClick={() => onSetEnded(Date.now())}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: 'spring', stiffness: 650, damping: 32 }}
             >
               <Flag size={13} strokeWidth={2.2} />
               Set end time
-            </button>
+            </motion.button>
           )}
-          {editing === 'end' && note.endedAt ? (
-            <TimeEditor label="End" value={note.endedAt} onSave={(ms) => onSetEnded(ms)} onClose={() => setEditing(null)} />
-          ) : null}
+          <AnimatePresence>
+            {editing === 'end' && note.endedAt ? (
+              <TimeEditor key="end" label="End" value={note.endedAt} onSave={(ms) => onSetEnded(ms)} onClose={() => setEditing(null)} />
+            ) : null}
+          </AnimatePresence>
         </span>
 
       </div>

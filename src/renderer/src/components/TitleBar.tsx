@@ -1,3 +1,4 @@
+import { motion } from 'motion/react'
 import { List, Pin, Plus, Settings2 } from 'lucide-react'
 
 interface TitleBarProps {
@@ -39,7 +40,7 @@ export function TitleBar(props: TitleBarProps): React.JSX.Element {
 
   const actions = (
     <div className="titlebar-actions no-drag">
-      <button
+      <motion.button
         type="button"
         className="glass-button"
         data-active={props.notesOpen}
@@ -47,13 +48,23 @@ export function TitleBar(props: TitleBarProps): React.JSX.Element {
         title="Switch note (⌘K)"
         data-probe="notes-button"
         onClick={props.onToggleNotes}
+        whileTap={{ scale: 0.9 }}
+        transition={{ type: 'spring', stiffness: 650, damping: 30 }}
       >
         <List size={15} strokeWidth={2} />
-      </button>
-      <button type="button" className="glass-button" aria-label="New note" title="New note (⌘N)" onClick={props.onNewNote}>
+      </motion.button>
+      <motion.button
+        type="button"
+        className="glass-button"
+        aria-label="New note"
+        title="New note (⌘N)"
+        onClick={props.onNewNote}
+        whileTap={{ scale: 0.9 }}
+        transition={{ type: 'spring', stiffness: 650, damping: 30 }}
+      >
         <Plus size={16} strokeWidth={2.2} />
-      </button>
-      <button
+      </motion.button>
+      <motion.button
         type="button"
         className="glass-button"
         data-active={props.settingsOpen}
@@ -61,9 +72,11 @@ export function TitleBar(props: TitleBarProps): React.JSX.Element {
         title="Settings (⌘,)"
         data-probe="settings-button"
         onClick={props.onToggleSettings}
+        whileTap={{ scale: 0.9 }}
+        transition={{ type: 'spring', stiffness: 650, damping: 30 }}
       >
         <Settings2 size={15} strokeWidth={2} />
-      </button>
+      </motion.button>
     </div>
   )
 
