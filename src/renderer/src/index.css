@@ -13,8 +13,8 @@ html:root {
   --radius: 14px;
   --font-sans: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Segoe UI Variable', 'Segoe UI', 'PingFang SC',
     'Hiragino Sans GB', 'Microsoft YaHei UI', sans-serif;
-  --font-serif: 'New York', ui-serif, 'Iowan Old Style', 'Charter', 'Songti SC', 'STSong', 'Source Han Serif SC',
-    'Noto Serif CJK SC', Georgia, serif;
+  --font-serif: Georgia, 'Iowan Old Style', 'Charter', 'Songti SC', 'STSong', 'Source Han Serif SC',
+    'Noto Serif CJK SC', serif;
   --note-font: var(--font-sans);
   --ink: #16161a;
   --ink-2: #5f6068;
@@ -24,8 +24,11 @@ html:root {
   --accent-ink: color-mix(in srgb, var(--accent) 82%, #000);
   --accent-soft: rgb(94 106 210 / 0.12);
   --accent-ring: rgb(94 106 210 / 0.35);
-  --glass-tint: rgb(250 250 251 / 0.9);
-  --glass-tint-strong: rgb(255 255 255 / 0.94);
+  --glass-rgb: 250 250 251;
+  --glass-alpha: 0.8;
+  --glass-blur: 30px;
+  --glass-tint: rgb(var(--glass-rgb) / var(--glass-alpha));
+  --glass-tint-strong: rgb(255 255 255 / calc(var(--glass-alpha) + 0.06));
   --rim: rgb(255 255 255 / 0.9);
   /* Sheet / panel surfaces. Overridden wholesale in dark mode. */
   --sheet-top: rgb(255 255 255 / 0.62);
@@ -99,8 +102,9 @@ html:root[data-theme='dark'] {
   --accent-ink: color-mix(in srgb, var(--accent) 74%, #fff);
   --accent-soft: rgb(113 122 255 / 0.15);
   --accent-ring: rgb(113 122 255 / 0.42);
-  --glass-tint: rgb(13 13 15 / 0.9);
-  --glass-tint-strong: rgb(20 20 23 / 0.94);
+  --glass-rgb: 13 13 15;
+  --glass-tint: rgb(var(--glass-rgb) / var(--glass-alpha));
+  --glass-tint-strong: rgb(20 20 23 / calc(var(--glass-alpha) + 0.06));
   --rim: rgb(255 255 255 / 0.08);
   --sheet-top: rgb(113 122 255 / 0.1);
   --sheet-bottom: rgb(58 70 160 / 0.1);
@@ -157,14 +161,6 @@ html:root[data-theme='dark'] {
   --delete-color: #ff6961;
 }
 
-/* Windows / Linux have no native desktop blur behind web content. */
-body:not([data-platform='darwin']) {
-  --glass-tint: rgb(250 250 251 / 0.94);
-}
-html[data-theme='dark'] body:not([data-platform='darwin']) {
-  --glass-tint: rgb(13 13 15 / 0.96);
-}
-
 /* Typeface switch (Settings → Typeface). */
 .shell[data-font='serif'] {
   --note-font: var(--font-serif);
@@ -209,7 +205,7 @@ body {
     radial-gradient(90% 50% at 100% 110%, var(--sheet-bottom), transparent 65%),
     linear-gradient(180deg, var(--sheet-wash), transparent),
     var(--glass-tint);
-  backdrop-filter: blur(40px) saturate(200%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(200%);
   box-shadow:
     inset 0 0 0 1px var(--edge-hairline),
     inset 0 1px 0 var(--rim),
@@ -613,7 +609,7 @@ button.meta-pill:hover {
   overflow: auto;
   border-radius: 18px;
   background: var(--panel-bg);
-  backdrop-filter: blur(36px) saturate(200%);
+  backdrop-filter: blur(calc(var(--glass-blur) * 0.9)) saturate(200%);
   box-shadow:
     inset 0 1px 0 var(--panel-inset),
     inset 0 0 0 1px var(--panel-edge),
@@ -1231,7 +1227,7 @@ html:root[data-theme='dark'] .token.variable {
     radial-gradient(90% 55% at 100% 120%, var(--sheet-bottom), transparent 65%),
     linear-gradient(180deg, var(--sheet-wash), transparent 40%),
     var(--glass-tint);
-  backdrop-filter: blur(30px) saturate(160%);
+  backdrop-filter: blur(var(--glass-blur)) saturate(160%);
   box-shadow:
     inset 0 0 0 1px var(--edge-hairline),
     inset 0 1px 0 var(--rim);
@@ -1353,7 +1349,7 @@ button.meta-pill:hover {
 .glass-panel {
   border-radius: 10px;
   background: var(--panel-bg);
-  backdrop-filter: blur(24px) saturate(160%);
+  backdrop-filter: blur(calc(var(--glass-blur) * 0.9)) saturate(160%);
   box-shadow:
     0 0 0 1px var(--panel-edge),
     0 16px 48px var(--panel-shadow);
@@ -1378,10 +1374,13 @@ button.meta-pill:hover {
 
 .notes-list {
   max-height: 340px;
-  padding: 0 6px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 4px 8px 8px;
 }
 .notes-row {
-  border-radius: 7px;
+  border-radius: 8px;
 }
 .notes-row[data-selected='true'] {
   background: var(--accent-soft);
@@ -1391,7 +1390,7 @@ button.meta-pill:hover {
 }
 .notes-open {
   gap: 10px !important;
-  padding: 7px 8px;
+  padding: 8px 9px;
 }
 .notes-title {
   font-size: 12.5px;

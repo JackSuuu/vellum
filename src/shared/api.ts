@@ -45,6 +45,7 @@ export interface VellumApi {
     systemTheme(): Promise<{ isDark: boolean }>
   }
   on: {
+    windowShown(cb: () => void): () => void
     newNote(cb: (templateId?: string) => void): () => void
     openSettings(cb: () => void): () => void
     noteChanged(cb: (noteId: string | null) => void): () => void

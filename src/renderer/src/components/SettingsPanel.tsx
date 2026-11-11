@@ -211,6 +211,30 @@ export function SettingsPanel({ settings, onChange, onClose }: SettingsPanelProp
             </div>
           </div>
           <div className="setting-row">
+            <span>Background blur</span>
+            <input
+              type="range"
+              min={0}
+              max={60}
+              step={2}
+              value={settings.glassBlur ?? 30}
+              aria-label="Background blur"
+              onChange={(e) => onChange({ glassBlur: Number(e.target.value) })}
+            />
+          </div>
+          <div className="setting-row">
+            <span>Glass opacity</span>
+            <input
+              type="range"
+              min={0.4}
+              max={1}
+              step={0.02}
+              value={settings.opacity ?? 0.8}
+              aria-label="Glass opacity"
+              onChange={(e) => onChange({ opacity: Number(e.target.value) })}
+            />
+          </div>
+          <div className="setting-row">
             <span>Text size</span>
             <input
               type="range"

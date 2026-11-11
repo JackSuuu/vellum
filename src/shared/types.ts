@@ -39,8 +39,10 @@ export interface AppSettings {
   alwaysOnTop: boolean
   /** Hide the floating window as soon as it loses focus (off by default). */
   hideOnBlur: boolean
-  /** 0.4 - 1 */
+  /** Glass opacity: 0.4 (very transparent) - 1 (solid). */
   opacity: number
+  /** Background blur strength in px (0 = none). */
+  glassBlur: number
   theme: ThemeMode
   /** Window width in px. */
   width: number

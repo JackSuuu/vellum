@@ -6,6 +6,7 @@ import { formatTime } from '../lib/format'
 
 interface NoteHeaderProps {
   note: Note
+  titleRef?: React.RefObject<HTMLInputElement | null>
   onRename: (title: string) => void
   onSetStarted: (createdAt: number) => void
   onSetEnded: (endedAt: number | null) => void
@@ -90,7 +91,14 @@ function TimeEditor({
 }
 
 /** Obsidian-style inline title, kept apart from the Markdown body. */
-export function NoteHeader({ note, onRename, onSetStarted, onSetEnded, onEnterBody }: NoteHeaderProps): React.JSX.Element {
+export function NoteHeader({
+  note,
+  titleRef,
+  onRename,
+  onSetStarted,
+  onSetEnded,
+  onEnterBody
+}: NoteHeaderProps): React.JSX.Element {
   const [draft, setDraft] = useState(note.title)
   const [editing, setEditing] = useState<'start' | 'end' | null>(null)
 
@@ -109,6 +117,7 @@ export function NoteHeader({ note, onRename, onSetStarted, onSetEnded, onEnterBo
   return (
     <section className="note-header" data-probe="note-header">
       <input
+        ref={titleRef}
         className="note-title"
         data-probe="note-title"
         value={draft}

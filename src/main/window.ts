@@ -1,6 +1,8 @@
 import { app, BrowserWindow, Menu, screen, shell } from 'electron'
 import type { MenuItemConstructorOptions } from 'electron'
 import { join } from 'node:path'
+import { IPC } from '@shared/ipc'
+import { broadcast } from './bus'
 import { DEFAULT_SETTINGS } from './store'
 
 const isMac = process.platform === 'darwin'
@@ -165,6 +167,9 @@ export function showWindow(): void {
   if (!win.isVisible()) win.show()
   if (isMac) app.focus({ steal: true })
   win.focus()
+  // Let the renderer put the caret back in the title when the floating note
+  // comes back into view (the editor keeps its own focus when switching notes).
+  broadcast(IPC.eventWindowShown)
 }
 
 export function hideWindow(): void {

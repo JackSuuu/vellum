@@ -51,6 +51,7 @@ const api: VellumApi = {
     systemTheme: () => ipcRenderer.invoke(IPC.appSystemTheme) as Promise<{ isDark: boolean }>
   },
   on: {
+    windowShown: (cb) => subscribe(IPC.eventWindowShown, cb),
     newNote: (cb) => subscribe(IPC.eventNewNote, cb),
     openSettings: (cb) => subscribe(IPC.eventOpenSettings, cb),
     noteChanged: (cb) => subscribe(IPC.eventNoteChanged, cb),

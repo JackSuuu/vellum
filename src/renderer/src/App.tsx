@@ -7,6 +7,7 @@ import { NotesPopover } from './components/NotesPopover'
 import { SettingsPanel } from './components/SettingsPanel'
 import { TitleBar } from './components/TitleBar'
 import { applyAccent } from './lib/accent'
+import { applyGlass } from './lib/glass'
 import { applyTheme, setSystemTheme, watchSystemTheme } from './lib/theme'
 
 const SAVE_DELAY = 350
@@ -28,6 +29,9 @@ export default function App(): React.JSX.Element {
   const [saveState, setSaveState] = useState<SaveState>('idle')
   const [panel, setPanelState] = useState<'none' | 'notes' | 'settings'>('none')
   const sheetRef = useRef<HTMLElement>(null)
+  const titleRef = useRef<HTMLInputElement>(null)
+  const panelRef = useRef(panel)
+  panelRef.current = panel
 
   /** Panels animate themselves out through AnimatePresence. */
   type Panel = 'none' | 'notes' | 'settings'
@@ -36,6 +40,8 @@ export default function App(): React.JSX.Element {
   }, [])
 
   const editorRef = useRef<MuyaEditorHandle>(null)
+  const settingsRef = useRef<AppSettings | null>(null)
+  settingsRef.current = settings
   const noteRef = useRef<Note | null>(null)
   noteRef.current = note
   /** Markdown that is on disk for the current note. */
@@ -77,12 +83,15 @@ export default function App(): React.JSX.Element {
     [persist]
   )
 
+  const focusTitle = useCallback(() => titleRef.current?.focus(), [])
+
   /* --------------------------------------------------------- switching -- */
   const open = useCallback(
-    async (next: Note | null) => {
+    async (next: Note | null, focusTarget: 'editor' | 'title' = 'editor') => {
       if (!next) return
       if (noteRef.current?.id === next.id) {
         setPanel('none')
+        if (focusTarget === 'title') focusTitle()
         return
       }
       await flush()
@@ -97,17 +106,18 @@ export default function App(): React.JSX.Element {
         const sheet = sheetRef.current
         sheet?.getAnimations().forEach((a) => a.cancel())
         sheet?.animate([{ opacity: 0.25 }, { opacity: 1 }], { duration: 180, easing: 'cubic-bezier(0.3, 0, 0.2, 1)' })
-        editorRef.current?.focus()
+        if (focusTarget === 'title') focusTitle()
+        else editorRef.current?.focus()
       })
     },
-    [flush, setPanel]
+    [flush, focusTitle, setPanel]
   )
 
   const refreshList = useCallback(async () => setNotes(await window.vellum.notes.list()), [])
 
   const newNote = useCallback(async () => {
     await flush()
-    await open(await window.vellum.notes.create())
+    await open(await window.vellum.notes.create(), 'title')
   }, [flush, open])
 
   /* ---------------------------------------------------------- bootstrap -- */
@@ -118,6 +128,7 @@ export default function App(): React.JSX.Element {
       setSettings(loadedSettings)
       applyTheme(loadedSettings.theme ?? 'system')
       applyAccent(loadedSettings.accent)
+      applyGlass(loadedSettings.opacity, loadedSettings.glassBlur)
       if (current) {
         savedRef.current = { id: current.id, markdown: current.markdown }
         setNote(current)
@@ -125,15 +136,27 @@ export default function App(): React.JSX.Element {
     })()
   }, [])
 
+  /* The quick note opens ready to title the note, not to overwrite the body. */
+  const bootFocused = useRef(false)
+  useEffect(() => {
+    if (bootFocused.current || !note || !settings) return
+    bootFocused.current = true
+    requestAnimationFrame(() => titleRef.current?.focus())
+  }, [note, settings])
+
   /* Events coming from the main process (tray menu, global shortcut). */
   useEffect(() => {
     const offs = [
+      window.vellum.on.windowShown(() => {
+        if (panelRef.current === 'none') requestAnimationFrame(focusTitle)
+      }),
       window.vellum.on.newNote(() => void newNote()),
       window.vellum.on.openSettings(() => setPanel('settings')),
       window.vellum.on.settingsChanged((next) => {
         setSettings(next)
         applyTheme(next.theme ?? 'system')
         applyAccent(next.accent)
+        applyGlass(next.opacity, next.glassBlur)
       }),
       window.vellum.on.noteChanged(async (id) => {
         // Saves are never echoed back, so this is always another note
@@ -144,7 +167,7 @@ export default function App(): React.JSX.Element {
       window.vellum.on.systemTheme((isDark) => setSystemTheme(isDark))
     ]
     return () => offs.forEach((off) => off())
-  }, [newNote, open])
+  }, [focusTitle, newNote, open])
 
   /* Save when the window goes to the background or closes. */
   useEffect(() => {
@@ -192,6 +215,10 @@ export default function App(): React.JSX.Element {
     setSettings((s) => (s ? { ...s, ...patch } : s))
     if (patch.accent) applyAccent(patch.accent)
     if (patch.theme) applyTheme(patch.theme)
+    if (patch.opacity !== undefined || patch.glassBlur !== undefined) {
+      const current = settingsRef.current
+      applyGlass(patch.opacity ?? current?.opacity ?? 0.8, patch.glassBlur ?? current?.glassBlur ?? 30)
+    }
     setSettings(await window.vellum.settings.update(patch))
   }, [])
 
@@ -260,6 +287,7 @@ export default function App(): React.JSX.Element {
         <main className="sheet" ref={sheetRef}>
           <NoteHeader
             note={note}
+            titleRef={titleRef}
             onRename={(t) => void rename(t)}
             onSetStarted={(t) => void setStarted(t)}
             onSetEnded={(e) => void setEnded(e)}

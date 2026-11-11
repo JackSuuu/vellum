@@ -18,7 +18,8 @@ export const DEFAULT_SETTINGS: AppSettings = {
   hotkey: 'CommandOrControl+.',
   alwaysOnTop: true,
   hideOnBlur: false,
-  opacity: 0.86,
+  opacity: 0.8,
+  glassBlur: 30,
   theme: 'system',
   width: 520,
   height: 700,
@@ -76,6 +77,9 @@ class JsonStore {
         this.data.settings.width = DEFAULT_SETTINGS.width
         this.data.settings.height = DEFAULT_SETTINGS.height
       }
+      // Glass opacity was stored but unused before it became adjustable; move
+      // the old placeholder default to the lighter, more glassy default.
+      if (this.data.settings.opacity === 0.86) this.data.settings.opacity = DEFAULT_SETTINGS.opacity
       // The old default template repeated the title, time and place in the body.
       for (const template of this.data.settings.templates) {
         if (template.content === LEGACY_TEMPLATE_BODY) {

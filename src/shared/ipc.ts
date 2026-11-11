@@ -33,6 +33,7 @@ export const IPC = {
   appSystemTheme: 'app:system-theme',
 
   // main -> renderer events
+  eventWindowShown: 'event:window-shown',
   eventNewNote: 'event:new-note',
   eventOpenSettings: 'event:open-settings',
   eventNoteChanged: 'event:note-changed',
