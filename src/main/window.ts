@@ -15,6 +15,8 @@ let baseHeight = DEFAULT_SETTINGS.height
 let quitting = false
 /** Only centre the window the first time; afterwards keep where the user dragged it. */
 let positioned = false
+/** Pending "unpin from all Spaces" after showing on the active one. */
+let workspaceTimer: NodeJS.Timeout | null = null
 
 app.on('before-quit', () => {
   quitting = true
@@ -63,9 +65,6 @@ export function createMainWindow(): BrowserWindow {
   })
 
   win.setAlwaysOnTop(alwaysOnTop, 'floating')
-  // `skipTransformProcessType` keeps the Dock icon stable; without it macOS
-  // flips the app into an accessory process and the Dock icon comes and goes.
-  win.setVisibleOnAllWorkspaces(true, { skipTransformProcessType: true })
 
   const rendererUrl = process.env['ELECTRON_RENDERER_URL']
   if (rendererUrl) void win.loadURL(rendererUrl)
@@ -163,9 +162,23 @@ export function showWindow(): void {
     positionWindow(win)
     positioned = true
   }
+  if (isMac) {
+    // The quick note should open on the Space the user is looking at, but stay
+    // there instead of following them everywhere. Joining all Spaces just for
+    // the show, then leaving again, moves the window to the active Space.
+    win.setVisibleOnAllWorkspaces(true, { skipTransformProcessType: true, visibleOnFullScreen: true })
+  }
   if (win.isMinimized()) win.restore()
-  if (!win.isVisible()) win.show()
-  if (isMac) app.focus({ steal: true })
+  win.show()
+  if (isMac) {
+    app.focus({ steal: true })
+    if (workspaceTimer) clearTimeout(workspaceTimer)
+    workspaceTimer = setTimeout(() => {
+      workspaceTimer = null
+      if (win.isDestroyed()) return
+      win.setVisibleOnAllWorkspaces(false, { skipTransformProcessType: true })
+    }, 120)
+  }
   win.focus()
   // Let the renderer put the caret back in the title when the floating note
   // comes back into view (the editor keeps its own focus when switching notes).
